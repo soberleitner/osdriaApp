@@ -1,5 +1,5 @@
 import wx
-from .welcomeScreen import WelcomeScreen
+from welcomeScreen import WelcomeScreen
 
 
 def osdriaApp():
