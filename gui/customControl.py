@@ -22,12 +22,12 @@ class Button(wx.Control):
 
         self.SetBackgroundStyle(wx.BG_STYLE_CUSTOM)
 
-        self.Bind(wx.EVT_SIZE, self.on_size)
-        self.Bind(wx.EVT_PAINT, self.on_paint)
-        self.Bind(wx.EVT_LEFT_DOWN, self.on_left_down)
-        self.Bind(wx.EVT_LEFT_UP, self.on_left_up)
-        self.Bind(wx.EVT_ENTER_WINDOW, self.on_enter_window)
-        self.Bind(wx.EVT_LEAVE_WINDOW, self.on_leave_window)
+        self.Bind(wx.EVT_SIZE, self.onSize)
+        self.Bind(wx.EVT_PAINT, self.onPaint)
+        self.Bind(wx.EVT_LEFT_DOWN, self.onLeftDown)
+        self.Bind(wx.EVT_LEFT_UP, self.onLeftUp)
+        self.Bind(wx.EVT_ENTER_WINDOW, self.onEnterWindow)
+        self.Bind(wx.EVT_LEAVE_WINDOW, self.onLeaveWindow)
 
     def DoGetBestSize(self):
         return self.normal.GetSize()
@@ -40,17 +40,17 @@ class Button(wx.Control):
         super(Button, self).Disable(*args, **kwargs)
         self.Refresh()
 
-    def post_event(self):
+    def postEvent(self):
         event = wx.CommandEvent()
         event.SetEventObject(self)
         event.SetEventType(wx.EVT_BUTTON.typeId)
         wx.PostEvent(self, event)
 
-    def on_size(self, event):
+    def onSize(self, event):
         event.Skip()
         self.Refresh()
 
-    def on_paint(self, event):
+    def onPaint(self, event):
         dc = wx.AutoBufferedPaintDC(self)
         dc.SetBackground(wx.Brush(self.GetParent().GetBackgroundColour()))
         dc.Clear()
@@ -60,35 +60,32 @@ class Button(wx.Control):
             bitmap = self.select or bitmap
         dc.DrawBitmap(bitmap, 0, 0, True)
 
-    def set_selected(self, selected):
+    def setSelected(self, selected):
         if self._toggle:
             if selected is not self._selected:
                 self._selected = selected
                 self.Refresh()
 
-    def get_selected(self):
+    def getSelected(self):
         return self._selected
 
-    selected = property(get_selected, set_selected)
+    selected = property(getSelected, setSelected)
 
-    def on_left_down(self, event):
+    def onLeftDown(self, event):
         x, y = event.GetPosition()
         if self.region.Contains(x, y):
             self.selected = not self.selected
             self._hover = not self._hover
 
-    def on_left_dclick(self, event):
-        self.on_left_down(event)
-
-    def on_left_up(self, event):
+    def onLeftUp(self, event):
         x, y = event.GetPosition()
         if self.region.Contains(x, y):
-            self.post_event()
+            self.postEvent()
 
-    def on_enter_window(self, event):
+    def onEnterWindow(self, event):
         self._hover = True
         self.Refresh()
 
-    def on_leave_window(self, event):
+    def onLeaveWindow(self, event):
         self._hover = False
         self.Refresh()
