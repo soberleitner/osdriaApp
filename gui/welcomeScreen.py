@@ -27,3 +27,11 @@ class WelcomeScreen(wx.Frame):
         #verticalSizer = wx.BoxSizer(wx.VERTICAL)
 
         #verticalSizer.Add()
+
+
+class ClassName(object):
+    """docstring for ClassName"""
+    def __init__(self, arg):
+        super(ClassName, self).__init__()
+        self.arg = arg
+        
