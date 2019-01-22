@@ -20,15 +20,12 @@ def init():
     for button in ICON_BUTTON_LIST:
         globals()[button] = {}
         for type in ICON_BUTTON_TYPES:
-            globals()[button][type] = wx.Bitmap(
-                ICON_DIRECTORY + button + "_" + type + ".png")
+            globals()[button][type] = ICON_DIRECTORY + button + "_" + type + ".png"
 
     for toggle in ICON_TOGGLE_LIST:
         globals()[toggle] = {}
         for type in ICON_TOGGLE_TYPE:
-            globals()[toggle][type] = wx.Bitmap(
-                ICON_DIRECTORY + toggle + "_" + type + ".png")
+            globals()[toggle][type] = ICON_DIRECTORY + toggle + "_" + type + ".png"
 
     for image in ICON_IMAGE_LIST:
-        globals()[image] = wx.Bitmap(
-            ICON_DIRECTORY + image + ".png")
+        globals()[image] = ICON_DIRECTORY + image + "@2x.png"

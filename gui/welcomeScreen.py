@@ -1,80 +1,114 @@
-import wx
+from PySide2.QtGui import *
+from PySide2.QtCore import *
+from PySide2.QtWidgets import *
 import appColors as col
 import appTexts as txt
 import appIcons as icn
 
 
-WELCOME_SCREEN_HEIGHT_RATIO = 2
+SCREEN_HEIGHT_RATIO = 2
 
 
-class WelcomeScreen(wx.Frame):
+class WelcomeScreen(QDialog):
     """Creation of the Welcome Screen
     includes interaction for creating new file
     as well as opening existing file
     """
+    newProject = True
+    filename = ""
+
     def __init__(self):
-        super(WelcomeScreen, self).__init__(parent=None, style=wx.CLOSE_BOX)
-        self.initUI()
+        super().__init__()
+        self.initUi()
 
-    def initUI(self):
+    def initUi(self):
         # define frame design
-        _screenHeight = wx.DisplaySize()[1] / WELCOME_SCREEN_HEIGHT_RATIO
-        self.SetSize(_screenHeight, _screenHeight)
-        self.Centre()
-
-        # define panel design
-        panel = wx.Panel(self)
-        panel.SetBackgroundColour(col.WHITE)
+        self.sizeScreen()
 
         # create content
-        logo = wx.StaticBitmap(panel, bitmap=icn.logo)
-        welcomeText = wx.StaticText(panel, label=txt.WELCOME)
-        createButton = ProjectButton(panel, icn.new, txt.CREATE_PROJECT)
-        openButton = ProjectButton(panel, icn.open, txt.OPEN_PROJECT)
+        self.logo = QLabel(self)
+        self.logo.setPixmap(QPixmap(icn.logo))
+        self.welcomeText = QLabel(txt.WELCOME)
+        self.createButton = ProjectButton(self, icn.new, txt.CREATE_PROJECT)
+        self.openButton = ProjectButton(self, icn.open, txt.OPEN_PROJECT)
 
         # define content structure
-        verticalSizer = wx.BoxSizer(wx.VERTICAL)
-        verticalSizer.Add(0, 10, 0)
-        verticalSizer.Add(logo, 0, wx.SHAPED | wx.ALIGN_CENTER)
-        verticalSizer.Add(welcomeText, 0, wx.SHAPED | wx.ALIGN_CENTER)
-        verticalSizer.Add(createButton, 0, wx.ALIGN_LEFT)
-        verticalSizer.Add(openButton, 0, wx.ALIGN_LEFT)
+        self.structureContent()
 
-        horizontalSizer = wx.BoxSizer()
-        horizontalSizer.AddStretchSpacer()
-        horizontalSizer.Add(verticalSizer, 0, wx.ALIGN_CENTER)
-        horizontalSizer.AddStretchSpacer()
-        panel.SetSizer(horizontalSizer)
+        # bind buttons to functions
+        self.createButton.clicked.connect(self.newDialog)
+        self.openButton.clicked.connect(self.openDialog)
+
+    def newDialog(self):
+        self.filename = QFileDialog.getSaveFileName(
+            self,
+            txt.CREATE_PROJECT['sub'])
+        self.accept()
+
+    def openDialog(self):
+        self.filename = QFileDialog.getSaveFileName(
+            self,
+            txt.CREATE_PROJECT['sub'],
+            ".",
+            FILE_EXTENSION)
+        self.newProject = False
+        self.accept()
+
+    def sizeScreen(self):
+        """define size and location of screen"""
+        desktopRect = QDesktopWidget().availableGeometry()
+        screenHeight = desktopRect.height() / SCREEN_HEIGHT_RATIO
+        screenCenter = desktopRect.center()
+        screenRect = QRect(0, 0, screenHeight, screenHeight)
+        screenRect.moveCenter(screenCenter)
+
+        self.setGeometry(screenRect)
+
+    def structureContent(self):
+        """define structure of contents"""
+        verticalSizer = QVBoxLayout()
+        verticalSizer.addSpacing(10)
+        verticalSizer.addWidget(self.logo, 0, Qt.AlignCenter)
+        verticalSizer.addWidget(self.welcomeText, 0, Qt.AlignCenter)
+        verticalSizer.addWidget(self.createButton, 0, Qt.AlignLeft)
+        verticalSizer.addWidget(self.openButton, 0, Qt.AlignLeft)
+
+        # align horizontally centered
+        horizontalSizer = QHBoxLayout(self)
+        horizontalSizer.addStretch()
+        horizontalSizer.addLayout(verticalSizer)
+        horizontalSizer.addStretch()
+        self.setLayout(horizontalSizer)
 
 
-class ProjectButton(wx.Panel):
+class ProjectButton(QWidget):
     """Entry level project buttons
     including icon, title and subtext"""
+    clicked = Signal()
+
     def __init__(self, parent, icon, text):
         super(ProjectButton, self).__init__(parent)
-        self.icon = wx.StaticBitmap(self, bitmap=icon)
-        self.title = wx.StaticText(self, label=text['main'])
-        self.sub = wx.StaticText(self, label=text['sub'])
+        self.icon = QLabel(self)
+        self.icon.setPixmap(QPixmap(icon))
+        self.title = QLabel(text['main'])
+        self.sub = QLabel(text['sub'])
 
         # vertical sizer for title and subtext
-        verticalSizer = wx.BoxSizer(wx.VERTICAL)
-        verticalSizer.Add(self.title, 0, wx.ALIGN_LEFT)
-        verticalSizer.Add(self.sub, 0, wx.ALIGN_LEFT)
+        verticalSizer = QVBoxLayout()
+        verticalSizer.addWidget(self.title, 0, Qt.AlignLeft)
+        verticalSizer.addWidget(self.sub, 0, Qt.AlignLeft)
 
         # horizontal sizer for icon and text
-        horizontalSizer = wx.BoxSizer(wx.HORIZONTAL)
-        horizontalSizer.Add(self.icon, 0, wx.ALIGN_CENTER)
-        horizontalSizer.Add(verticalSizer, 0, wx.ALIGN_LEFT)
-        self.SetSizer(horizontalSizer)
+        horizontalSizer = QHBoxLayout(self)
+        horizontalSizer.addWidget(self.icon, 0, Qt.AlignCenter)
+        horizontalSizer.addLayout(verticalSizer)
+        self.setLayout(horizontalSizer)
 
-        # change cursor type when entering the window
-        self.Bind(wx.EVT_ENTER_WINDOW, self.onEnterWindow)
-        self.Bind(wx.EVT_LEAVE_WINDOW, self.onLeaveWindow)
+    def mousePressEvent(self, event):
+        self.clicked.emit()
 
-    def onEnterWindow(self, event):
-        handCursor = wx.Cursor(wx.CURSOR_HAND)
-        self.GetParent().SetCursor(handCursor)
+    def enterEvent(self, event):
+        self.setCursor(Qt.PointingHandCursor)
 
-    def onLeaveWindow(self, event):
-        arrowCursor = wx.Cursor(wx.CURSOR_ARROW)
-        self.SetCursor(arrowCursor)
+    def leaveEvent(self, event):
+        self.unsetCursor()
