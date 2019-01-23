@@ -4,7 +4,7 @@ import wx
 
 ICON_DIRECTORY = "/Users/stefan/Dropbox/Uni/Master/Semester_04/01_master_thesis/05_OSDRIA/01_GUI/gui_icons/"
 
-ICON_BUTTON_LIST = ["add", "back", "export", "graph",
+ICON_BUTTON_LIST = ["add", "back", "close", "export", "graph",
                     "minus", "run", "scenarios", "trash"]
 ICON_BUTTON_TYPES = ["normal", "select"]
 
@@ -20,12 +20,12 @@ def init():
     for button in ICON_BUTTON_LIST:
         globals()[button] = {}
         for type in ICON_BUTTON_TYPES:
-            globals()[button][type] = ICON_DIRECTORY + button + "_" + type + ".png"
+            globals()[button][type] = ICON_DIRECTORY + button + "_" + type + "@2x.png"
 
     for toggle in ICON_TOGGLE_LIST:
         globals()[toggle] = {}
         for type in ICON_TOGGLE_TYPE:
-            globals()[toggle][type] = ICON_DIRECTORY + toggle + "_" + type + ".png"
+            globals()[toggle][type] = ICON_DIRECTORY + toggle + "_" + type + "@2x.png"
 
     for image in ICON_IMAGE_LIST:
         globals()[image] = ICON_DIRECTORY + image + "@2x.png"

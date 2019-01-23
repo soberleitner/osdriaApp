@@ -4,8 +4,6 @@ from PySide2.QtCore import *
 from PySide2.QtWidgets import *
 from welcomeScreen import WelcomeScreen
 
-FILE_EXTENSION = "OSCAR files (*.pdf)"
-
 
 class osdriaApp():
     """top-level class of app"""
@@ -14,18 +12,24 @@ class osdriaApp():
         QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
         QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
 
+        # load stylesheet
+        styleFile = QFile('style.css')
+        styleFile.open(QFile.ReadOnly)
+        style = str(styleFile.readAll())
+
         # load icons from files
         icn.init()
 
         osdria = QApplication([])
+        osdria.setStyleSheet(style)
 
-        # create welcomeDialog
+        # display welcomeDialog
         welcomeDialog = WelcomeScreen()
         if not welcomeDialog.exec_():
-            sys.exit(-1)
+            sys.exit(0)
 
         print(welcomeDialog.filename)
-        # ProjectScreen(file=welcomeDialog.filename[0], new=welcomeDialog.newProject)
+        # ProjectScreen(file=welcomeDialog.filename, new=welcomeDialog.newProject)
 
         sys.exit(osdria.exec_())
 

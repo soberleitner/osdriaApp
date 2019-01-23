@@ -1,0 +1,12 @@
+WelcomeScreen {
+    background-color: white;
+}
+
+ProjectButton QLabel {
+    color: grey;
+}
+
+WelcomeScreen QPushButton:hover {
+    background-color: grey;
+    border: 0px;
+}

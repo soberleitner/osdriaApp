@@ -7,6 +7,7 @@ import appIcons as icn
 
 
 SCREEN_HEIGHT_RATIO = 2
+FILE_EXTENSION = "OSCAR files (*.pdf)"
 
 
 class WelcomeScreen(QDialog):
@@ -16,16 +17,23 @@ class WelcomeScreen(QDialog):
     """
     newProject = True
     filename = ""
+    leftClick = False
 
     def __init__(self):
-        super().__init__()
+        super().__init__(None, Qt.FramelessWindowHint)
         self.initUi()
 
     def initUi(self):
-        # define frame design
+        # define dialog design
         self.sizeScreen()
 
         # create content
+        self.closeButton = QPushButton(self)
+        closeIcon = QPixmap(icn.close['normal'])
+        self.closeButton.setIcon(closeIcon)
+        self.closeButton.setFixedSize(closeIcon.rect().size())
+        self.closeButton.setFlat(True)
+
         self.logo = QLabel(self)
         self.logo.setPixmap(QPixmap(icn.logo))
         self.welcomeText = QLabel(txt.WELCOME)
@@ -36,21 +44,29 @@ class WelcomeScreen(QDialog):
         self.structureContent()
 
         # bind buttons to functions
+        self.closeButton.clicked.connect(self.reject)
         self.createButton.clicked.connect(self.newDialog)
         self.openButton.clicked.connect(self.openDialog)
 
     def newDialog(self):
-        self.filename = QFileDialog.getSaveFileName(
-            self,
-            txt.CREATE_PROJECT['sub'])
+        self.dialog = QFileDialog(self, txt.CREATE_PROJECT['sub'])
+        self.dialog.setAcceptMode(QFileDialog.AcceptSave)
+        self.dialog.accepted.connect(self.closeNewDialog)
+        self.dialog.open()
+
+    def closeNewDialog(self):
+        self.filename = self.dialog.selectedFiles()[0]
         self.accept()
 
     def openDialog(self):
-        self.filename = QFileDialog.getSaveFileName(
-            self,
-            txt.CREATE_PROJECT['sub'],
-            ".",
-            FILE_EXTENSION)
+        self.dialog = QFileDialog(self, txt.OPEN_PROJECT['sub'])
+        self.dialog.setAcceptMode(QFileDialog.AcceptOpen)
+        self.dialog.setNameFilter(FILE_EXTENSION)
+        self.dialog.accepted.connect(self.closeOpenDialog)
+        self.dialog.open()
+
+    def closeOpenDialog(self):
+        self.filename = self.dialog.selectedFiles()[0]
         self.newProject = False
         self.accept()
 
@@ -66,25 +82,45 @@ class WelcomeScreen(QDialog):
 
     def structureContent(self):
         """define structure of contents"""
-        verticalSizer = QVBoxLayout()
-        verticalSizer.addSpacing(10)
-        verticalSizer.addWidget(self.logo, 0, Qt.AlignCenter)
-        verticalSizer.addWidget(self.welcomeText, 0, Qt.AlignCenter)
-        verticalSizer.addWidget(self.createButton, 0, Qt.AlignLeft)
-        verticalSizer.addWidget(self.openButton, 0, Qt.AlignLeft)
+        vSizer = QVBoxLayout()
+        vSizer.addSpacing(10)
+        vSizer.addWidget(self.logo, 0, Qt.AlignCenter)
+        vSizer.addWidget(self.welcomeText, 0, Qt.AlignCenter)
+        vSizer.addWidget(self.createButton, 0, Qt.AlignLeft)
+        vSizer.addWidget(self.openButton, 0, Qt.AlignLeft)
 
         # align horizontally centered
-        horizontalSizer = QHBoxLayout(self)
-        horizontalSizer.addStretch()
-        horizontalSizer.addLayout(verticalSizer)
-        horizontalSizer.addStretch()
-        self.setLayout(horizontalSizer)
+        hSizer = QHBoxLayout()
+        hSizer.addStretch()
+        hSizer.addLayout(vSizer)
+        hSizer.addStretch()
+
+        # align vertically, close button above
+        topVSizer = QVBoxLayout(self)
+        topVSizer.addWidget(self.closeButton, 0, Qt.AlignLeft)
+        topVSizer.addLayout(hSizer)
+        self.setLayout(topVSizer)
+
+    def mousePressEvent(self, event):
+        if event.button() is Qt.LeftButton:
+            self.relativeCursorPosition = self.pos() - event.globalPos()
+            self.leftClick = True
+
+    def mouseReleaseEvent(self, event):
+        if event.button() is Qt.LeftButton:
+            self.leftClick = False
+
+    def mouseMoveEvent(self, event):
+        """move dialog with mouse clicked move"""
+        if self.leftClick:
+            self.move(event.globalPos() + self.relativeCursorPosition)
 
 
 class ProjectButton(QWidget):
     """Entry level project buttons
     including icon, title and subtext"""
     clicked = Signal()
+    hovered = Signal()
 
     def __init__(self, parent, icon, text):
         super(ProjectButton, self).__init__(parent)
@@ -112,3 +148,12 @@ class ProjectButton(QWidget):
 
     def leaveEvent(self, event):
         self.unsetCursor()
+
+    def onPaint():
+        option = QStyleOption()
+        opt.initFrom(self)
+        painter = QPainter(self)
+        self.style().drawPrimitive(QStyle.PE_FrameFocusRect,
+                                   option,
+                                   painter,
+                                   self)
