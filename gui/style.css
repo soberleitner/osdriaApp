@@ -1,12 +1,45 @@
-WelcomeScreen {
+QDialog * {
+    font-family: arial;
+}
+
+QDialog > QFrame {
+    background-color: #808080;
+    border-radius: 10px;
+}
+
+WelcomeScreen > QFrame {
     background-color: white;
+    border-radius: 10px;
+}
+
+WelcomeScreen QFrame > QLabel {
+    font-size: 30px;
 }
 
 ProjectButton QLabel {
-    color: grey;
+    color: #4F4F4F;
+    padding-left: 15px;
 }
 
-WelcomeScreen QPushButton:hover {
-    background-color: grey;
-    border: 0px;
+ProjectButton QLabel[type="main"] {
+    font-size: 15px;
+    font-weight: bold;
+    padding-left: 4px;
+}
+
+ProjectButton QLabel[type="sub"] {
+    font-size: 12px;
+    padding-left: 6px;
+}
+
+ProjectScreen * {
+    border: 1px solid;
+}
+
+ProjectScreen Toolbar {
+    background-color: #092957;
+}
+
+ProjectScreen ToolButton {
+
 }

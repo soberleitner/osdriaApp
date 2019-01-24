@@ -11,3 +11,11 @@ OPEN_PROJECT = {
     'main': "Open ...",
     'sub': "Existing " + APP_NAME + " project"
 }
+
+SECTIONS = {
+    'over': "Overview",
+    'energy': "Energy",
+    'water': "Water",
+    'food': "Food",
+    'busi': "Business"
+}

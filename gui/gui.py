@@ -3,6 +3,7 @@ import appIcons as icn
 from PySide2.QtCore import *
 from PySide2.QtWidgets import *
 from welcomeScreen import WelcomeScreen
+from projectScreen import ProjectScreen
 
 
 class osdriaApp():
@@ -17,11 +18,11 @@ class osdriaApp():
         styleFile.open(QFile.ReadOnly)
         style = str(styleFile.readAll())
 
-        # load icons from files
-        icn.init()
-
         osdria = QApplication([])
         osdria.setStyleSheet(style)
+
+        # load icons from files
+        icn.init()
 
         # display welcomeDialog
         welcomeDialog = WelcomeScreen()
@@ -29,7 +30,10 @@ class osdriaApp():
             sys.exit(0)
 
         print(welcomeDialog.filename)
-        # ProjectScreen(file=welcomeDialog.filename, new=welcomeDialog.newProject)
+        projectScreen = ProjectScreen(
+            welcomeDialog.filename,
+            welcomeDialog.newProject)
+        projectScreen.show()
 
         sys.exit(osdria.exec_())
 

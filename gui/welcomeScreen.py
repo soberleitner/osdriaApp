@@ -6,7 +6,7 @@ import appTexts as txt
 import appIcons as icn
 
 
-SCREEN_HEIGHT_RATIO = 2
+SCREEN_SIZE = 450
 FILE_EXTENSION = "OSCAR files (*.pdf)"
 
 
@@ -20,7 +20,8 @@ class WelcomeScreen(QDialog):
     leftClick = False
 
     def __init__(self):
-        super().__init__(None, Qt.FramelessWindowHint)
+        super().__init__(None, Qt.Window | Qt.FramelessWindowHint)
+        self.setAttribute(Qt.WA_TranslucentBackground)
         self.initUi()
 
     def initUi(self):
@@ -28,17 +29,17 @@ class WelcomeScreen(QDialog):
         self.sizeScreen()
 
         # create content
-        self.closeButton = QPushButton(self)
-        closeIcon = QPixmap(icn.close['normal'])
-        self.closeButton.setIcon(closeIcon)
-        self.closeButton.setFixedSize(closeIcon.rect().size())
+        self.frame = QFrame(self)
+        self.closeButton = QPushButton(self.frame)
+        self.closeButton.setIcon(icn.close)
         self.closeButton.setFlat(True)
+        self.closeButton.setChecked(True)
 
-        self.logo = QLabel(self)
-        self.logo.setPixmap(QPixmap(icn.logo))
+        self.logo = QLabel(self.frame)
+        self.logo.setPixmap(icn.logo)
         self.welcomeText = QLabel(txt.WELCOME)
-        self.createButton = ProjectButton(self, icn.new, txt.CREATE_PROJECT)
-        self.openButton = ProjectButton(self, icn.open, txt.OPEN_PROJECT)
+        self.createButton = ProjectButton(self.frame, icn.new, txt.CREATE_PROJECT)
+        self.openButton = ProjectButton(self.frame, icn.open, txt.OPEN_PROJECT)
 
         # define content structure
         self.structureContent()
@@ -49,7 +50,7 @@ class WelcomeScreen(QDialog):
         self.openButton.clicked.connect(self.openDialog)
 
     def newDialog(self):
-        self.dialog = QFileDialog(self, txt.CREATE_PROJECT['sub'])
+        self.dialog = QFileDialog(self.frame, txt.CREATE_PROJECT['sub'])
         self.dialog.setAcceptMode(QFileDialog.AcceptSave)
         self.dialog.accepted.connect(self.closeNewDialog)
         self.dialog.open()
@@ -59,7 +60,7 @@ class WelcomeScreen(QDialog):
         self.accept()
 
     def openDialog(self):
-        self.dialog = QFileDialog(self, txt.OPEN_PROJECT['sub'])
+        self.dialog = QFileDialog(self.frame, txt.OPEN_PROJECT['sub'])
         self.dialog.setAcceptMode(QFileDialog.AcceptOpen)
         self.dialog.setNameFilter(FILE_EXTENSION)
         self.dialog.accepted.connect(self.closeOpenDialog)
@@ -72,10 +73,8 @@ class WelcomeScreen(QDialog):
 
     def sizeScreen(self):
         """define size and location of screen"""
-        desktopRect = QDesktopWidget().availableGeometry()
-        screenHeight = desktopRect.height() / SCREEN_HEIGHT_RATIO
-        screenCenter = desktopRect.center()
-        screenRect = QRect(0, 0, screenHeight, screenHeight)
+        screenCenter = QDesktopWidget().availableGeometry().center()
+        screenRect = QRect(0, 0, SCREEN_SIZE, SCREEN_SIZE)
         screenRect.moveCenter(screenCenter)
 
         self.setGeometry(screenRect)
@@ -83,7 +82,8 @@ class WelcomeScreen(QDialog):
     def structureContent(self):
         """define structure of contents"""
         vSizer = QVBoxLayout()
-        vSizer.addSpacing(10)
+        vSizer.setMargin(0)
+        vSizer.setSpacing(0)
         vSizer.addWidget(self.logo, 0, Qt.AlignCenter)
         vSizer.addWidget(self.welcomeText, 0, Qt.AlignCenter)
         vSizer.addWidget(self.createButton, 0, Qt.AlignLeft)
@@ -91,15 +91,22 @@ class WelcomeScreen(QDialog):
 
         # align horizontally centered
         hSizer = QHBoxLayout()
+        hSizer.setMargin(0)
+        hSizer.setSpacing(0)
         hSizer.addStretch()
         hSizer.addLayout(vSizer)
         hSizer.addStretch()
 
         # align vertically, close button above
-        topVSizer = QVBoxLayout(self)
+        topVSizer = QVBoxLayout(self.frame)
+        topVSizer.setMargin(0)
         topVSizer.addWidget(self.closeButton, 0, Qt.AlignLeft)
         topVSizer.addLayout(hSizer)
-        self.setLayout(topVSizer)
+        self.frame.setLayout(topVSizer)
+
+        topSizer = QHBoxLayout(self)
+        topSizer.addWidget(self.frame)
+        self.setLayout(topSizer)
 
     def mousePressEvent(self, event):
         if event.button() is Qt.LeftButton:
@@ -119,24 +126,36 @@ class WelcomeScreen(QDialog):
 class ProjectButton(QWidget):
     """Entry level project buttons
     including icon, title and subtext"""
+    MAIN_TEXT_HEIGHT = 17
+    SUB_TEXT_HEIGHT = 13
+
     clicked = Signal()
     hovered = Signal()
 
     def __init__(self, parent, icon, text):
         super(ProjectButton, self).__init__(parent)
         self.icon = QLabel(self)
-        self.icon.setPixmap(QPixmap(icon))
+        self.icon.setPixmap(icon)
         self.title = QLabel(text['main'])
+        self.title.setFixedHeight(self.MAIN_TEXT_HEIGHT)
+        self.title.setProperty("type", "main")
         self.sub = QLabel(text['sub'])
+        self.sub.setFixedHeight(self.SUB_TEXT_HEIGHT)
+        self.sub.setProperty("type", "sub")
 
         # vertical sizer for title and subtext
         verticalSizer = QVBoxLayout()
+        verticalSizer.setMargin(0)
+        verticalSizer.setSpacing(0)
+        verticalSizer.setContentsMargins(0, 0, 0, 0)
         verticalSizer.addWidget(self.title, 0, Qt.AlignLeft)
         verticalSizer.addWidget(self.sub, 0, Qt.AlignLeft)
 
         # horizontal sizer for icon and text
         horizontalSizer = QHBoxLayout(self)
-        horizontalSizer.addWidget(self.icon, 0, Qt.AlignCenter)
+        horizontalSizer.setMargin(0)
+        horizontalSizer.setSpacing(0)
+        horizontalSizer.addWidget(self.icon, 0, Qt.AlignLeft)
         horizontalSizer.addLayout(verticalSizer)
         self.setLayout(horizontalSizer)
 

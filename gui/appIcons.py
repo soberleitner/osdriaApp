@@ -1,5 +1,7 @@
 """definition of all icons used in the app"""
-import wx
+from PySide2.QtGui import *
+from PySide2.QtCore import *
+from PySide2.QtWidgets import *
 
 
 ICON_DIRECTORY = "/Users/stefan/Dropbox/Uni/Master/Semester_04/01_master_thesis/05_OSDRIA/01_GUI/gui_icons/"
@@ -18,14 +20,26 @@ ICON_IMAGE_LIST = ["new", "open", "logo"]
 def init():
     """Initialise icons as class variable with both states as dictionary"""
     for button in ICON_BUTTON_LIST:
-        globals()[button] = {}
+        globals()[button] = QIcon()
         for type in ICON_BUTTON_TYPES:
-            globals()[button][type] = ICON_DIRECTORY + button + "_" + type + "@2x.png"
+            iconMode = QIcon.Normal
+            if type is "select":
+                iconMode = QIcon.Active
+            globals()[button].addPixmap(QPixmap(
+                ICON_DIRECTORY + button + "_" + type + "@2x.png"),
+                iconMode,
+                QIcon.On)
 
     for toggle in ICON_TOGGLE_LIST:
-        globals()[toggle] = {}
+        globals()[toggle] = QIcon()
         for type in ICON_TOGGLE_TYPE:
-            globals()[toggle][type] = ICON_DIRECTORY + toggle + "_" + type + "@2x.png"
+            iconMode = QIcon.Normal
+            if type is "select_orange":
+                iconMode = QIcon.Active
+            globals()[button].addPixmap(QPixmap(
+                ICON_DIRECTORY + toggle + "_" + type + "@2x.png"),
+                iconMode,
+                QIcon.On)
 
     for image in ICON_IMAGE_LIST:
-        globals()[image] = ICON_DIRECTORY + image + "@2x.png"
+        globals()[image] = QPixmap(ICON_DIRECTORY + image + "@2x.png")
