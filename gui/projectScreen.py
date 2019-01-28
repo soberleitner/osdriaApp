@@ -1,28 +1,37 @@
 from PySide2.QtCore import *
+from PySide2.QtGui import *
 from PySide2.QtWidgets import *
 
-import appIcons as icn
-
-from toolbar import Toolbar
+from ui import main
 
 
-class ProjectScreen(QMainWindow):
+class ProjectScreen(main.Ui_MainWindow, QMainWindow):
     """Main Project window"""
     def __init__(self, filename, newProject=True):
         super(ProjectScreen, self).__init__()
+        self.setupUi(self)
 
-        self.initUi()
+        # bind actions
+        self.logo.hovered.connect(self.changeTitle)
+        self.logo.clicked.connect(self.changePageToSections)
+        self.toolBackSections.clicked.connect(self.changePageToOverview)
+        self.toolGraph.clicked.connect(self.changePageToGraph)
+        self.toolDraft.clicked.connect(self.changePageToDraft)
+        self.toolBackDraft.clicked.connect(self.changePageToSections)
+        self.toolBackGraph.clicked.connect(self.changePageToSections)
 
-    def initUi(self):
-        self.setWindowState(Qt.WindowFullScreen)
-        self.toolbar = Toolbar(self)
+    def changeTitle(self, sectionName="Overview"):
+        self.titleOverview.setText(sectionName)
 
-        self.verticalLayout = QVBoxLayout()
-        self.verticalLayout.setMargin(0)
-        self.verticalLayout.setSpacing(0)
-        self.verticalLayout.setSizeConstraint(QLayout.SetFixedSize)
-        self.verticalLayout.addWidget(self.toolbar, 1, Qt.AlignTop)
-        self.setLayout(self.verticalLayout)
+    def changePageToOverview(self):
+        self.stackedPages.setCurrentIndex(0)
 
-    def resizeEvent(self, event):
-        self.toolbar.setFixedWidth(self.width())
+    def changePageToSections(self, section):
+        self.stackedPages.setCurrentIndex(1)
+        self.titleSections.setText(section)
+
+    def changePageToDraft(self):
+        self.stackedPages.setCurrentIndex(2)
+
+    def changePageToGraph(self):
+        self.stackedPages.setCurrentIndex(3)

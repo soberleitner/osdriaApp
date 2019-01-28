@@ -29,10 +29,7 @@ class osdriaApp():
         if not welcomeDialog.exec_():
             sys.exit(0)
 
-        print(welcomeDialog.filename)
-        projectScreen = ProjectScreen(
-            welcomeDialog.filename,
-            welcomeDialog.newProject)
+        projectScreen = ProjectScreen(welcomeDialog.newProject)
         projectScreen.show()
 
         sys.exit(osdria.exec_())

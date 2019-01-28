@@ -5,25 +5,29 @@ from PySide2.QtWidgets import *
 import appTexts as txt
 import appIcons as icn
 
-class Toolbar(QWidget):
+
+class Toolbar(QFrame):
     """custom toolbar with specficied spaces"""
 
     def __init__(self, parent):
         super(Toolbar, self).__init__(parent)
-        self.parent = parent
 
-        self.initSize()
-        self.initElements()
+        # initialize size
+        self.setFixedHeight(50)
+        self.setFixedWidth(parent.width())
+        
+        #initialize structure
+        self.horizontalLayout = QHBoxLayout(self)
+        self.setLayout(self.horizontalLayout)
         self.toBase()
-        self.initStructure()
 
     def initSize(self):
-        self.setFixedHeight(50)
-        self.setFixedWidth(self.parent.width())
+        
 
     def initElements(self):
-        print("initElements")
+        # initialization not possible this way, will appear at the toolbar because of parent setting
         self.label = QLabel(self)
+        #self.label.setFixedHeight(50)
         self.empty = ToolButton(self, "empty")
         self.dropdown = QComboBox(self)
 
@@ -33,7 +37,6 @@ class Toolbar(QWidget):
             vars(self)[icon] = ToolButton(self, vars(icn)[icon])
 
     def initStructure(self):
-        print("initStructure")
         leftLayout = QHBoxLayout()
         leftLayout.addWidget(self.tools[1])
         leftLayout.addWidget(self.tools[2])
@@ -50,14 +53,16 @@ class Toolbar(QWidget):
         rightLayout.addWidget(self.tools[9])
         rightLayout.addWidget(self.tools[10])
 
-        topLayout = QHBoxLayout(self)
-        topLayout.addLayout(leftLayout)
-        topLayout.addWidget(self.label, 0, Qt.AlignHCenter)
-        topLayout.addLayout(rightLayout)
-        self.setLayout(topLayout)
+        self.topLayout = QHBoxLayout(self)
+        self.topLayout.setMargin(0)
+        self.topLayout.setSpacing(0)
+        self.topLayout.addLayout(leftLayout)
+        self.topLayout.addWidget(self.label, 0, Qt.AlignHCenter)
+        self.topLayout.addLayout(rightLayout)
+        self.setLayout(self.topLayout)
 
     def toBase(self):
-        print("toBase")
+        # new intialisation
         self.label.setText(txt.SECTIONS['over'])
         self.tools = [
             self.empty,
@@ -76,6 +81,15 @@ class Toolbar(QWidget):
     def toSector():
         pass
 
+    def onPaint():
+        option = QStyleOption()
+        opt.initFrom(self)
+        painter = QPainter(self)
+        self.style().drawPrimitive(QStyle.PE_FrameFocusRect,
+                                   option,
+                                   painter,
+                                   self)
+
 
 class ToolButton(QToolButton):
     """custom toolbar button"""
@@ -83,15 +97,16 @@ class ToolButton(QToolButton):
         super(ToolButton, self).__init__(parent)
 
         if icon is "empty":
-            self.setIcon(QIcon(QPixmap(50, 50)))
+            self.setIcon(icn.trash)
         else:
             self.setIcon(icon)
-        self.setFixedSize(50, 50)
+        # self.setFixedSize(50, 50)
+        # self.setContentsMargins(0, 0, 0, 0)
 
     def enterEvent(self, event):
         print("enter")
-        self.setIcon(QIcon(self.icon().pixmap(QSize(30, 30), QIcon.Active)))
+        self.setIcon(QIcon(self.icon().pixmap(QSize(100, 100), QIcon.Active)))
 
     def leaveEvent(self, event):
         print("leave")
-        self.setIcon(QIcon(self.icon().pixmap(QSize(30, 30), QIcon.Normal)))
+        self.setIcon(QIcon(self.icon().pixmap(QSize(100, 100), QIcon.Normal)))

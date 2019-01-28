@@ -7,39 +7,23 @@ QDialog > QFrame {
     border-radius: 10px;
 }
 
-WelcomeScreen > QFrame {
+#welcomeFrame {
     background-color: white;
     border-radius: 10px;
 }
 
-WelcomeScreen QFrame > QLabel {
-    font-size: 30px;
+WelcomeScreen *, ProjectScreen * {
+    border: 0px;
 }
 
-ProjectButton QLabel {
-    color: #4F4F4F;
-    padding-left: 15px;
-}
-
-ProjectButton QLabel[type="main"] {
-    font-size: 15px;
-    font-weight: bold;
-    padding-left: 4px;
-}
-
-ProjectButton QLabel[type="sub"] {
-    font-size: 12px;
-    padding-left: 6px;
-}
-
-ProjectScreen * {
-    border: 1px solid;
-}
-
-ProjectScreen Toolbar {
+#toolbarOverview, #toolbarSections, #toolbarDraft, #toolbarGraph, ToolButton {
     background-color: #092957;
 }
 
-ProjectScreen ToolButton {
+#titleOverview, #titleSections, #titleDraft, #titleGraph {
+    color: #fff;
+}
 
+#buttonClose {
+    background-color: #fff;
 }
