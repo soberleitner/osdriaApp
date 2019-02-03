@@ -1,0 +1,87 @@
+QDialog > QFrame {
+    background-color: #808080;
+    border-radius: 10px;
+}
+
+#frame_main {
+    background-color: white;
+}
+
+ProjectView * {
+    border: 0px;
+}
+
+#toolbarOverview, #toolbarSections, #toolbarDraft, #toolbarGraph, ToolButton {
+    background-color: #092957;
+}
+
+#titleOverview, #titleSections, #titleDraft, #titleGraph {
+    color: #fff;
+}
+
+#button_close {
+    background-color: #fff;
+    border: 0px;
+}
+
+#mainOverview, #mainSections, #mainDraft, #mainGraph {
+    background-color: #fff;
+}
+
+QComboBox {
+    border: 0px;
+    border-radius: 2px;
+    background-color: #d1d1d1;
+    color: #4f4f4f;
+}
+
+QComboBox:on { /* shift the text when the popup opens */
+    padding-top: 3px;
+    padding-left: 4px;
+}
+
+QComboBox::down-arrow {
+    border: 0px;
+    image: url(":/icons/icons/dropdown_normal@2x.png");
+    width: 10px;
+    height: 10px;
+}
+
+QComboBox::drop-down {
+    border: 0px;
+    subcontrol-origin: padding;
+    subcontrol-position: right;
+    width: 15px;
+}
+
+QComboBox QAbstractItemView {
+    border: 0px;
+    border-radius: 2px;
+    selection-background-color: white;
+    background-color: #d1d1d1;
+}
+
+Sidebar {
+    background-color: #d1d1d1;
+}
+
+PropertyWidget > QLabel {
+    font-size: 16px;
+    color: #4f4f4f;
+}
+
+PropertyWidget > QLineEdit, PropertyWidget > QComboBox, PropertyWidget > QPushButton {
+    font-size: 22px;
+    color: #fff;
+}
+
+PropertyWidget > QLineEdit {
+    border: 0px;
+    padding: 0px;
+    background-color: transparent;
+}
+
+PropertyWidget > QPushButton {
+    border: 0px;
+    text-align: left;
+}
