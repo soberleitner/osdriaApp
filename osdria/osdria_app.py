@@ -1,5 +1,4 @@
 import sys
-import pickle
 
 from PySide2.QtCore import QFile, Qt
 from PySide2.QtWidgets import QApplication
@@ -32,14 +31,9 @@ class App(QApplication):
             sys.exit(0)
 
         # create new or open existing model
-        self.filename = self.welcome_controller.filename
-        if self.welcome_controller.new_project is True:
-            self.model = Model(self.filename)
-            # with open(self.filename, 'wb') as file:
-            #     pickle.dump(self.model, file, pickle.HIGHEST_PROTOCOL)
-        else:
-            with open(self.filename, 'rb') as file:
-                self.model = pickle.load(file)
+        self.model = Model(
+            self.welcome_controller.filename,
+            self.welcome_controller.new_project)
 
         # display project window
         self.project_controller = ProjectCtrl(self.model)
