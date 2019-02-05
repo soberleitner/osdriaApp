@@ -1,4 +1,12 @@
+from enum import Enum
 from PySide2.QtCore import *
+
+
+class PropType(Enum):
+    """define property types"""
+    LINE_EDIT = 0
+    DIALOG = 1
+    CONEXT_MENU = 1
 
 
 class Properties(QObject):
