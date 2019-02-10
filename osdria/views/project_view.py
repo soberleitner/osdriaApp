@@ -1,78 +1,146 @@
-from PySide2.QtCore import *
-from PySide2.QtGui import *
 from PySide2.QtWidgets import *
 
 from views.project_view_ui import Ui_MainWindow
-import views.components.sidebar as sidebar
-
-
-sidebarDataOverview = [
-    {
-        "name": "Project Name",
-        "value": "Nsutam",
-        "type": sidebar.PROP_TYPE_TEXT
-    },
-    {
-        "name": "Project Location",
-        "value": "6.98, -1.91",
-        "type": sidebar.PROP_TYPE_DIALOG,
-        "dialog": "location"
-    },
-    {
-        "name": "Project Area",
-        "value": "120.0 ha",
-        "type": sidebar.PROP_TYPE_TEXT
-    }]
+from models.constants import OverviewSelection, PageType, SelectConnect, ZoomType
 
 
 class ProjectView(QMainWindow):
     """Main Project window"""
-    def __init__(self, filename, newProject=True):
+
+    def __init__(self, model, project_controller):
         super(ProjectView, self).__init__()
+
+        self._model = model
+        self._project_ctrl = project_controller
         self._ui = Ui_MainWindow()
         self._ui.setupUi(self)
-        self._ui.titleOverview.setText("Overview")
-        self._ui.logo.resetLogo()
 
-        # bind data source
-        self._ui.sidebarOverview.loadData(sidebarDataOverview)
+        """connect widgets to controller"""
+        # overview toolbar
+        self._ui.tool_scenarios.clicked.connect(
+            self._project_ctrl.open_scenario_dialog)
+        self._ui.select_scenario.currentIndexChanged.connect(
+            self._project_ctrl.change_scenario)
+        self._ui.tool_run.clicked.connect(self._project_ctrl.run_optimization)
+        self._ui.tool_export.clicked.connect(
+            self._project_ctrl.open_export_dialog)
+        self._ui.tool_sidebar_overview.clicked.connect(
+            lambda: self._project_ctrl.toggle_sidebar(PageType.OVERVIEW))
+        # overview content
+        self._ui.logo.hovered.connect(self._project_ctrl.change_icon)
+        self._ui.logo.clicked.connect(
+            lambda: self._project_ctrl.change_page(PageType.SECTIONS))
+        # sections toolbar
+        self._ui.tool_back_sections.clicked.connect(
+            lambda: self._project_ctrl.change_page(PageType.OVERVIEW))
+        self._ui.tool_draft.clicked.connect(
+            lambda: self._project_ctrl.change_page(PageType.DRAFT))
+        self._ui.tool_graph.clicked.connect(
+            lambda: self._project_ctrl.change_page(PageType.GRAPH))
+        self._ui.tool_sidebar_sections.clicked.connect(
+            lambda: self._project_ctrl.toggle_sidebar(PageType.SECTIONS))
+        # sections content
 
-        # bind actions
-        self._ui.logo.hovered.connect(self._ui.titleOverview.setText)
+        # draft toolbar
+        self._ui.tool_back_draft.clicked.connect(
+            lambda: self._project_ctrl.change_page(PageType.SECTIONS))
+        self._ui.tool_cursor.clicked.connect(
+            lambda: self._project_ctrl.toggle_select_connect(
+                SelectConnect.SELECT))
+        self._ui.tool_connect.clicked.connect(
+            lambda: self._project_ctrl.toggle_select_connect(
+                SelectConnect.CONNECT))
+        self._ui.tool_sidebar_draft.clicked.connect(
+            lambda: self._project_ctrl.toggle_sidebar(PageType.DRAFT))
+        # draft content
 
-        self._ui.logo.clicked.connect(self.toSectionsPage)
-        self._ui.toolDraft.clicked.connect(self.toDraftPage)
-        self._ui.toolGraph.clicked.connect(self.toGraphPage)
-        self._ui.toolBackSections.clicked.connect(self.toBackPage)
-        self._ui.toolBackDraft.clicked.connect(self.toBackPage)
-        self._ui.toolBackGraph.clicked.connect(self.toBackPage)
+        # graph toolbar
+        self._ui.tool_back_graph.clicked.connect(
+            lambda: self._project_ctrl.change_page(PageType.SECTIONS))
+        self._ui.select_commodity.currentIndexChanged.connect(
+            self._project_ctrl.change_graph_commodity)
+        self._ui.tool_export_graph.clicked.connect(
+            self._project_ctrl.open_export_dialog)
+        self._ui.tool_cursor_graph.clicked.connect(
+            lambda: self._project_ctrl.change_zoom_mode(ZoomType.SELECT))
+        self._ui.tool_zoom_in.clicked.connect(
+            lambda: self._project_ctrl.change_zoom_mode(ZoomType.ZOOM_IN))
+        self._ui.tool_zoom_out.clicked.connect(
+            lambda: self._project_ctrl.change_zoom_mode(ZoomType.ZOOM_OUT))
+        self._ui.tool_zoom_range.clicked.connect(
+            lambda: self._project_ctrl.change_zoom_mode(ZoomType.ZOOM_RANGE))
+        # graph content
 
-        self._ui.toolSidebarOverview.clicked.connect(self._ui.sidebarOverview.toggle)
-        self._ui.toolSidebarSections.clicked.connect(self._ui.sidebarSections.toggle)
-        self._ui.toolSidebarDraft.clicked.connect(self._ui.sidebarDraft.toggle)
-        self._ui.toolBackDraft.clicked.connect(self._ui.draftbar.toggle)
-        self._ui.toolDraft.clicked.connect(self._ui.draftbar.toggle)
+        """listen for model event signals"""
+        # stacked pages
+        self._model.current_page_changed.connect(
+            self._ui.stacked_pages.setCurrentIndex)
+        # overview page
+        self._model.overview_selection_changed.connect(
+            self.on_selection_change)
+        self._model.overview_properties_changed.connect(
+            self._ui.sidebar_overview.load_data)
+        self._model.overview_sidebar_out_changed.connect(
+            self._ui.sidebar_overview.toggle)
 
-    def toSectionsPage(self, section):
-        """prepare for switch to sections page"""
-        self._ui.titleSections.setText(section)
-        self._ui.stackedPages.setCurrentIndex(1)
+        # sections page
+        self._model.current_section_changed.connect(
+            self.on_section_change)
+        self._model.sections_sidebar_out_changed.connect(
+            self._ui.sidebar_sections.toggle)
 
-    def toDraftPage(self):
-        """prepare for switch to draft page"""
-        self._ui.titleDraft.setText(str(self._ui.titleSections.text()) + " - Draft")
-        self._ui.stackedPages.setCurrentIndex(2)
+        # draft page
+        self._model.draft_select_mode_changed.connect(
+            self.on_select_mode_change)
+        self._model.draft_sidebar_out_changed.connect(
+            self._ui.sidebar_draft.toggle)
 
-    def toGraphPage(self):
-        """prepare for switch to graph page"""
-        self._ui.titleGraph.setText(self._ui.titleSections.text())
-        self._ui.stackedPages.setCurrentIndex(3)
+        # graph page
+        self._model.graph_zoom_mode_changed.connect(
+            self.on_zoom_mode_change)
+        self._model.current_commodity_changed.connect(
+            self.on_commodity_change)
 
-    def toBackPage(self, senderButton):
-        """define stackedPages index of back buttons"""
-        pageBackCount = 1
-        if senderButton is self._ui.toolBackGraph:
-            pageBackCount += 1
+        """initialise view"""
+        self._ui.stacked_pages.setCurrentIndex(self._model.current_page.value)
+        self._ui.sidebar_overview.load_data(self._model.overview_properties)
 
-        newStackedPagesIndex = self._ui.stackedPages.currentIndex() - pageBackCount
-        self._ui.stackedPages.setCurrentIndex(newStackedPagesIndex)
+    def on_selection_change(self, selection):
+        self._ui.logo.change_icon(OverviewSelection(selection))
+        self._ui.title_overview.setText(OverviewSelection(selection).name.title())
+
+    def on_section_change(self, section):
+        self._ui.title_sections.setText(section)
+        self._ui.title_draft.setText(section + " - Draft")
+
+    def on_select_mode_change(self, select_type):
+        self._ui.tool_cursor.setChecked(False)
+        self._ui.tool_connect.setChecked(False)
+
+        if SelectConnect(select_type) is SelectConnect.SELECT:
+            self._ui.tool_cursor.setChecked()
+        else:
+            self._ui.tool_connect.setChecked()
+
+    def on_zoom_mode_change(self, zoom_value):
+        self._ui.tool_cursor_graph.setChecked(False)
+        self._ui.tool_zoom_in.setChecked(False)
+        self._ui.tool_zoom_out.setChecked(False)
+        self._ui.tool_zoom_range.setChecked(False)
+
+        zoom_type = ZoomType(zoom_value)
+        if zoom_type is ZoomType.SELECT:
+            self._ui.tool_cursor_graph.setChecked()
+        elif zoom_type is ZoomType.ZOOM_IN:
+            self._ui.tool_zoom_in.setChecked()
+        elif zoom_type is ZoomType.ZOOM_OUT:
+            self._ui.tool_zoom_out.setChecked()
+        else:
+            self._ui.tool_zoom_range.setChecked()
+
+    def on_commodity_change(self, commodity):
+        if commodity is not None:
+            self._ui.tool_graph.show()
+            self._ui.title_graph.setText(commodity.name)
+        else:
+            self._ui.tool_graph.hide()

@@ -1,6 +1,8 @@
-from PySide2.QtGui import *
-from PySide2.QtCore import *
-from PySide2.QtWidgets import *
+from enum import Enum
+from PySide2.QtCore import Signal
+from PySide2.QtGui import QPixmap
+from PySide2.QtWidgets import QLabel
+from models.model import OverviewSelection
 
 import osdria_app_rc
 
@@ -8,78 +10,60 @@ import osdria_app_rc
 class SectionSelector(QLabel):
     """hover effect over different sections of logo
     and navigation to respective page"""
-    clicked = Signal(str)
-    hovered = Signal(str)
+    hovered = Signal(int)
+    clicked = Signal()
 
     def __init__(self, parent):
         super(SectionSelector, self).__init__(parent)
-        self._section = "Overview"
-        self.loadLogos()
+        self.image = [
+            QPixmap(":/icons/img/logo_light@2x.png"),
+            QPixmap(":/icons/img/logo_light_energy@2x.png"),
+            QPixmap(":/icons/img/logo_light_water@2x.png"),
+            QPixmap(":/icons/img/logo_light_food@2x.png"),
+            QPixmap(":/icons/img/logo_light_business@2x.png")
+        ]
 
-    def resetLogo(self):
-        self.section = "Overview"
-
-    def loadLogos(self):
-        self.image = {
-            "Overview": QPixmap(":/icons/img/logo_light@2x.png"),
-            "Energy": QPixmap(":/icons/img/logo_light_energy@2x.png"),
-            "Water": QPixmap(":/icons/img/logo_light_water@2x.png"),
-            "Food": QPixmap(":/icons/img/logo_light_food@2x.png"),
-            "Business": QPixmap(":/icons/img/logo_light_business@2x.png")
-        }
-
-    @property
-    def section(self):
-        return self._section
-
-    @section.setter
-    def section(self, value):
-        print("section change")
-        if value in self.image.keys():
-            self._section = value
-            self.setPixmap(self.image[self.section])
+    def change_icon(self, selection):
+        self.setPixmap(self.image[selection.value])
 
     def mouseMoveEvent(self, event):
         """set section variable according to mouse position"""
-        relativeX = event.pos().x() / self.width()
-        relativeY = event.pos().y() / self.height()
+        relative_x = event.pos().x() / self.width()
+        relative_y = event.pos().y() / self.height()
 
         # check conditions for all four section regions
-        energyX = (relativeX > 50 / 1800) & (relativeX < 570 / 1800)
-        energyY = (relativeY > 950 / 1800) & (relativeY < 1500 / 1800)
-        waterX = (relativeX > 700 / 1800) & (relativeX < 1100 / 1800)
-        waterY = (relativeY > 0 / 1800) & (relativeY < 500 / 1800)
-        foodX = (relativeX > 1230 / 1800) & (relativeX < 1750 / 1800)
-        foodY = (relativeY > 950 / 1800) & (relativeY < 1500 / 1800)
-        businessX = (relativeX > 570 / 1800) & (relativeX < 1230 / 1800)
-        businessY = (relativeY > 600 / 1800) & (relativeY < 1200 / 1800)
+        energy_x = (relative_x > 50 / 1800) & (relative_x < 570 / 1800)
+        energy_y = (relative_y > 950 / 1800) & (relative_y < 1500 / 1800)
+        water_x = (relative_x > 700 / 1800) & (relative_x < 1100 / 1800)
+        water_y = (relative_y > 0 / 1800) & (relative_y < 500 / 1800)
+        food_x = (relative_x > 1230 / 1800) & (relative_x < 1750 / 1800)
+        food_y = (relative_y > 950 / 1800) & (relative_y < 1500 / 1800)
+        business_x = (relative_x > 570 / 1800) & (relative_x < 1230 / 1800)
+        business_y = (relative_y > 600 / 1800) & (relative_y < 1200 / 1800)
 
         # perform hovering effect for the corresponding section
-        if energyX & energyY:
-            self.section = "Energy"
-        elif waterX & waterY:
-            self.section = "Water"
-        elif foodX & foodY:
-            self.section = "Food"
-        elif businessX & businessY:
-            self.section = "Business"
+        if energy_x & energy_y:
+            section = OverviewSelection.ENERGY
+        elif water_x & water_y:
+            section = OverviewSelection.WATER
+        elif food_x & food_y:
+            section = OverviewSelection.FOOD
+        elif business_x & business_y:
+            section = OverviewSelection.BUSINESS
         else:
-            self.section = "Overview"
+            section = OverviewSelection.OVERVIEW
 
         # emit hovered signal to change title
-        self.hovered.emit(self.section)
+        self.hovered.emit(section.value)
 
     def mousePressEvent(self, event):
-        """emit clicked signal with corresponding section"""
-        if self._section is not "Overview":
-            self.clicked.emit(self.section)
+        self.clicked.emit()
 
     def resizeEvent(self, event):
-        print("resizeEvent()")
         """keep aspect ratio of logo"""
         width = self.width()
         height = self.height()
-        posX = (self.parent().width() - width) / 2
-        posY = (self.parent().height() - height) / 2
-        minSize = min(width, height)
-        self.setGeometry(posX, posY, minSize, minSize)
+        pos_x = (self.parent().width() - width) / 2
+        pos_y = (self.parent().height() - height) / 2
+        min_size = min(width, height)
+        self.setGeometry(pos_x, pos_y, min_size, min_size)

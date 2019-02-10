@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'welcome_view.ui'
+# Form implementation generated from reading ui file 'welcome_view.ui',
+# licensing of 'welcome_view.ui' applies.
 #
-# Created: Sun Feb  3 20:06:32 2019
-#      by: pyside2-uic 2.0.0 running on PySide2 5.6.0~a1
+# Created: Sun Feb 10 18:45:13 2019
+#      by: pyside2-uic  running on PySide2 5.12.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -42,7 +43,7 @@ class Ui_Dialog(object):
         self.horizontalLayoutClose.setContentsMargins(10, 5, -1, -1)
         self.horizontalLayoutClose.setObjectName("horizontalLayoutClose")
         self.button_close = ToolButton(self.frame_main)
-        self.button_close.setEnabled(True)
+        self.button_close.setEnabled(False)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -188,7 +189,7 @@ class Ui_Dialog(object):
         self.labelOpenTitle.setText(QtWidgets.QApplication.translate("Dialog", "Open ...", None, -1))
         self.labelOpenSub.setText(QtWidgets.QApplication.translate("Dialog", "Existing OSDRIA project", None, -1))
 
-from views.components.project_button import ProjectButton
 from views.components.tool_button import ToolButton
+from views.components.project_button import ProjectButton
 import osdria_app_rc
 import osdria_app_rc

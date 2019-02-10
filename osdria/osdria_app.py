@@ -3,7 +3,7 @@ import sys
 from PySide2.QtCore import QFile, Qt
 from PySide2.QtWidgets import QApplication
 
-from model.model import Model
+from models.model import Model
 from controllers.welcome_ctrl import WelcomeCtrl
 from controllers.project_ctrl import ProjectCtrl
 from views.welcome_view import WelcomeView
@@ -12,6 +12,7 @@ from views.project_view import ProjectView
 
 class App(QApplication):
     """top-level class of app"""
+
     def __init__(self, sys_argv):
         super().__init__(sys_argv)
 
@@ -20,9 +21,9 @@ class App(QApplication):
         self.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
 
         # load stylesheet
-        styleFile = QFile('resources/style.css')
-        styleFile.open(QFile.ReadOnly)
-        self.setStyleSheet(str(styleFile.readAll()))
+        style_file = QFile('resources/style.css')
+        style_file.open(QFile.ReadOnly)
+        self.setStyleSheet(str(style_file.readAll()))
 
         # display welcome dialog
         self.welcome_controller = WelcomeCtrl()

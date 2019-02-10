@@ -94,7 +94,7 @@
         <item>
          <widget class="ToolButton" name="button_close">
           <property name="enabled">
-           <bool>true</bool>
+           <bool>false</bool>
           </property>
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -418,15 +418,15 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>ToolButton</class>
+   <extends>QToolButton</extends>
+   <header>views/components/tool_button.h</header>
+  </customwidget>
+  <customwidget>
    <class>ProjectButton</class>
    <extends>QWidget</extends>
    <header>views/components/project_button.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>ToolButton</class>
-   <extends>QToolButton</extends>
-   <header>views/components/tool_button.h</header>
   </customwidget>
  </customwidgets>
  <resources>

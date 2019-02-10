@@ -34,12 +34,12 @@
      <number>0</number>
     </property>
     <item>
-     <widget class="QStackedWidget" name="stackedPages">
+     <widget class="QStackedWidget" name="stacked_pages">
       <property name="lineWidth">
        <number>0</number>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="overview">
        <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0">
@@ -59,7 +59,7 @@
          <number>0</number>
         </property>
         <item>
-         <widget class="QFrame" name="toolbarOverview">
+         <widget class="QFrame" name="toolbar_overview">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -126,7 +126,7 @@
             </spacer>
            </item>
            <item>
-            <widget class="ToolButton" name="toolScenarios">
+            <widget class="ToolButton" name="tool_scenarios">
              <property name="enabled">
               <bool>false</bool>
              </property>
@@ -168,7 +168,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QComboBox" name="selectorScenarios">
+            <widget class="QComboBox" name="select_scenario">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -227,7 +227,7 @@
             </widget>
            </item>
            <item>
-            <widget class="ToolButton" name="toolRun">
+            <widget class="ToolButton" name="tool_run">
              <property name="enabled">
               <bool>false</bool>
              </property>
@@ -260,7 +260,7 @@
             </widget>
            </item>
            <item>
-            <widget class="ToolButton" name="toolExport">
+            <widget class="ToolButton" name="tool_export">
              <property name="enabled">
               <bool>false</bool>
              </property>
@@ -300,7 +300,7 @@
             </spacer>
            </item>
            <item>
-            <widget class="QLabel" name="titleOverview">
+            <widget class="QLabel" name="title_overview">
              <property name="minimumSize">
               <size>
                <width>0</width>
@@ -365,7 +365,7 @@
             </spacer>
            </item>
            <item>
-            <widget class="ToolButton" name="toolSidebarOverview">
+            <widget class="ToolButton" name="tool_sidebar_overview">
              <property name="enabled">
               <bool>false</bool>
              </property>
@@ -386,10 +386,8 @@
              </property>
              <property name="icon">
               <iconset resource="osdria_app.qrc">
-               <normaloff>:/icons/img/sidebar_select_orange@2x.png</normaloff>
-               <normalon>:/icons/img/sidebar_normal@2x.png</normalon>
-               <disabledoff>:/icons/img/sidebar_normal@2x.png</disabledoff>
-               <disabledon>:/icons/img/sidebar_select_orange@2x.png</disabledon>:/icons/img/sidebar_select_orange@2x.png</iconset>
+               <normaloff>:/icons/img/sidebar_select@2x.png</normaloff>
+               <disabledoff>:/icons/img/sidebar_normal@2x.png</disabledoff>:/icons/img/sidebar_select@2x.png</iconset>
              </property>
              <property name="iconSize">
               <size>
@@ -398,10 +396,10 @@
               </size>
              </property>
              <property name="checkable">
-              <bool>true</bool>
+              <bool>false</bool>
              </property>
              <property name="checked">
-              <bool>true</bool>
+              <bool>false</bool>
              </property>
             </widget>
            </item>
@@ -409,7 +407,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QFrame" name="mainOverview">
+         <widget class="QFrame" name="main_overview">
           <property name="frameShape">
            <enum>QFrame::StyledPanel</enum>
           </property>
@@ -436,7 +434,7 @@
             <number>0</number>
            </property>
            <item>
-            <widget class="QFrame" name="logoFrame">
+            <widget class="QFrame" name="logo_frame">
              <property name="frameShape">
               <enum>QFrame::StyledPanel</enum>
              </property>
@@ -575,7 +573,7 @@
             </widget>
            </item>
            <item>
-            <widget class="Sidebar" name="sidebarOverview">
+            <widget class="Sidebar" name="sidebar_overview">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                <horstretch>0</horstretch>
@@ -634,7 +632,7 @@
          <number>0</number>
         </property>
         <item>
-         <widget class="QFrame" name="toolbarSections">
+         <widget class="QFrame" name="toolbar_sections">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -685,7 +683,7 @@
             <number>0</number>
            </property>
            <item>
-            <widget class="ToolButton" name="toolBackSections">
+            <widget class="ToolButton" name="tool_back_sections">
              <property name="enabled">
               <bool>false</bool>
              </property>
@@ -727,7 +725,7 @@
             </widget>
            </item>
            <item>
-            <widget class="ToolButton" name="toolDraft">
+            <widget class="ToolButton" name="tool_draft">
              <property name="enabled">
               <bool>false</bool>
              </property>
@@ -742,10 +740,8 @@
              </property>
              <property name="icon">
               <iconset resource="osdria_app.qrc">
-               <normaloff>:/icons/img/draft_select_orange@2x.png</normaloff>
-               <normalon>:/icons/img/draft_normal@2x.png</normalon>
-               <disabledoff>:/icons/img/draft_normal@2x.png</disabledoff>
-               <disabledon>:/icons/img/draft_select_orange@2x.png</disabledon>:/icons/img/draft_select_orange@2x.png</iconset>
+               <normaloff>:/icons/img/draft_select@2x.png</normaloff>
+               <disabledoff>:/icons/img/draft_normal@2x.png</disabledoff>:/icons/img/draft_select@2x.png</iconset>
              </property>
              <property name="iconSize">
               <size>
@@ -754,7 +750,7 @@
               </size>
              </property>
              <property name="checkable">
-              <bool>true</bool>
+              <bool>false</bool>
              </property>
             </widget>
            </item>
@@ -775,7 +771,7 @@
             </spacer>
            </item>
            <item>
-            <widget class="ToolButton" name="toolGraph">
+            <widget class="ToolButton" name="tool_graph">
              <property name="enabled">
               <bool>false</bool>
              </property>
@@ -821,7 +817,7 @@
             </spacer>
            </item>
            <item>
-            <widget class="QLabel" name="titleSections">
+            <widget class="QLabel" name="title_sections">
              <property name="minimumSize">
               <size>
                <width>0</width>
@@ -884,7 +880,7 @@
             </spacer>
            </item>
            <item>
-            <widget class="ToolButton" name="toolSidebarSections">
+            <widget class="ToolButton" name="tool_sidebar_sections">
              <property name="enabled">
               <bool>false</bool>
              </property>
@@ -905,10 +901,8 @@
              </property>
              <property name="icon">
               <iconset resource="osdria_app.qrc">
-               <normaloff>:/icons/img/sidebar_select_orange@2x.png</normaloff>
-               <normalon>:/icons/img/sidebar_normal@2x.png</normalon>
-               <disabledoff>:/icons/img/sidebar_normal@2x.png</disabledoff>
-               <disabledon>:/icons/img/sidebar_select_orange@2x.png</disabledon>:/icons/img/sidebar_select_orange@2x.png</iconset>
+               <normaloff>:/icons/img/sidebar_select@2x.png</normaloff>
+               <disabledoff>:/icons/img/sidebar_normal@2x.png</disabledoff>:/icons/img/sidebar_select@2x.png</iconset>
              </property>
              <property name="iconSize">
               <size>
@@ -917,7 +911,7 @@
               </size>
              </property>
              <property name="checkable">
-              <bool>true</bool>
+              <bool>false</bool>
              </property>
             </widget>
            </item>
@@ -925,15 +919,15 @@
          </widget>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="mainSections">
+         <layout class="QHBoxLayout" name="main_sections">
           <property name="spacing">
            <number>0</number>
           </property>
           <item>
-           <widget class="QGraphicsView" name="sectionView"/>
+           <widget class="QGraphicsView" name="section_view"/>
           </item>
           <item>
-           <widget class="Sidebar" name="sidebarSections">
+           <widget class="Sidebar" name="sidebar_sections">
             <property name="maximumSize">
              <size>
               <width>260</width>
@@ -976,7 +970,7 @@
          <number>0</number>
         </property>
         <item>
-         <widget class="QFrame" name="toolbarDraft">
+         <widget class="QFrame" name="toolbar_draft">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -1043,7 +1037,7 @@
             </spacer>
            </item>
            <item>
-            <widget class="ToolButton" name="toolBackDraft">
+            <widget class="ToolButton" name="tool_back_draft">
              <property name="enabled">
               <bool>false</bool>
              </property>
@@ -1058,10 +1052,8 @@
              </property>
              <property name="icon">
               <iconset resource="osdria_app.qrc">
-               <normaloff>:/icons/img/draft_select_orange@2x.png</normaloff>
-               <normalon>:/icons/img/draft_normal@2x.png</normalon>
-               <disabledoff>:/icons/img/draft_normal@2x.png</disabledoff>
-               <disabledon>:/icons/img/draft_select_orange@2x.png</disabledon>:/icons/img/draft_select_orange@2x.png</iconset>
+               <normaloff>:/icons/img/draft_select@2x.png</normaloff>
+               <disabledoff>:/icons/img/draft_normal@2x.png</disabledoff>:/icons/img/draft_select@2x.png</iconset>
              </property>
              <property name="iconSize">
               <size>
@@ -1070,10 +1062,10 @@
               </size>
              </property>
              <property name="checkable">
-              <bool>true</bool>
+              <bool>false</bool>
              </property>
              <property name="checked">
-              <bool>true</bool>
+              <bool>false</bool>
              </property>
             </widget>
            </item>
@@ -1094,7 +1086,7 @@
             </spacer>
            </item>
            <item>
-            <widget class="ToolButton" name="toolCursor">
+            <widget class="ToolButton" name="tool_cursor">
              <property name="enabled">
               <bool>false</bool>
              </property>
@@ -1115,10 +1107,9 @@
              </property>
              <property name="icon">
               <iconset resource="osdria_app.qrc">
-               <normaloff>:/icons/img/cursor_select_orange@2x.png</normaloff>
-               <normalon>:/icons/img/cursor_normal@2x.png</normalon>
+               <normaloff>:/icons/img/cursor_select@2x.png</normaloff>
                <disabledoff>:/icons/img/cursor_normal@2x.png</disabledoff>
-               <disabledon>:/icons/img/cursor_select_orange@2x.png</disabledon>:/icons/img/cursor_select_orange@2x.png</iconset>
+               <disabledon>:/icons/img/cursor_select_orange@2x.png</disabledon>:/icons/img/cursor_select@2x.png</iconset>
              </property>
              <property name="iconSize">
               <size>
@@ -1135,7 +1126,7 @@
             </widget>
            </item>
            <item>
-            <widget class="ToolButton" name="toolConnect">
+            <widget class="ToolButton" name="tool_connect">
              <property name="enabled">
               <bool>false</bool>
              </property>
@@ -1150,10 +1141,9 @@
              </property>
              <property name="icon">
               <iconset resource="osdria_app.qrc">
-               <normaloff>:/icons/img/connect_select_orange@2x.png</normaloff>
-               <normalon>:/icons/img/connect_normal@2x.png</normalon>
+               <normaloff>:/icons/img/connect_select@2x.png</normaloff>
                <disabledoff>:/icons/img/connect_normal@2x.png</disabledoff>
-               <disabledon>:/icons/img/connect_select_orange@2x.png</disabledon>:/icons/img/connect_select_orange@2x.png</iconset>
+               <disabledon>:/icons/img/connect_select_orange@2x.png</disabledon>:/icons/img/connect_select@2x.png</iconset>
              </property>
              <property name="iconSize">
               <size>
@@ -1180,7 +1170,7 @@
             </spacer>
            </item>
            <item>
-            <widget class="QLabel" name="titleDraft">
+            <widget class="QLabel" name="title_draft">
              <property name="minimumSize">
               <size>
                <width>0</width>
@@ -1243,7 +1233,7 @@
             </spacer>
            </item>
            <item>
-            <widget class="ToolButton" name="toolSidebarDraft">
+            <widget class="ToolButton" name="tool_sidebar_draft">
              <property name="enabled">
               <bool>false</bool>
              </property>
@@ -1264,10 +1254,8 @@
              </property>
              <property name="icon">
               <iconset resource="osdria_app.qrc">
-               <normaloff>:/icons/img/sidebar_select_orange@2x.png</normaloff>
-               <normalon>:/icons/img/sidebar_normal@2x.png</normalon>
-               <disabledoff>:/icons/img/sidebar_normal@2x.png</disabledoff>
-               <disabledon>:/icons/img/sidebar_select_orange@2x.png</disabledon>:/icons/img/sidebar_select_orange@2x.png</iconset>
+               <normaloff>:/icons/img/sidebar_select@2x.png</normaloff>
+               <disabledoff>:/icons/img/sidebar_normal@2x.png</disabledoff>:/icons/img/sidebar_select@2x.png</iconset>
              </property>
              <property name="iconSize">
               <size>
@@ -1302,10 +1290,10 @@
            </widget>
           </item>
           <item>
-           <widget class="QGraphicsView" name="draftView"/>
+           <widget class="QGraphicsView" name="draft_view"/>
           </item>
           <item>
-           <widget class="Sidebar" name="sidebarDraft">
+           <widget class="Sidebar" name="sidebar_draft">
             <property name="maximumSize">
              <size>
               <width>260</width>
@@ -1342,7 +1330,7 @@
          <number>0</number>
         </property>
         <item>
-         <widget class="QFrame" name="toolbarGraph">
+         <widget class="QFrame" name="toolbar_graph">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -1393,7 +1381,7 @@
             <number>0</number>
            </property>
            <item>
-            <widget class="ToolButton" name="toolBackGraph">
+            <widget class="ToolButton" name="tool_back_graph">
              <property name="enabled">
               <bool>false</bool>
              </property>
@@ -1451,7 +1439,7 @@
             </spacer>
            </item>
            <item>
-            <widget class="QComboBox" name="selectGraph">
+            <widget class="QComboBox" name="select_commodity">
              <property name="minimumSize">
               <size>
                <width>200</width>
@@ -1461,7 +1449,7 @@
             </widget>
            </item>
            <item>
-            <widget class="ToolButton" name="toolExportGraph">
+            <widget class="ToolButton" name="tool_export_graph">
              <property name="enabled">
               <bool>false</bool>
              </property>
@@ -1507,7 +1495,7 @@
             </spacer>
            </item>
            <item>
-            <widget class="QLabel" name="titleGraph">
+            <widget class="QLabel" name="title_graph">
              <property name="minimumSize">
               <size>
                <width>0</width>
@@ -1554,7 +1542,7 @@
             </spacer>
            </item>
            <item>
-            <widget class="ToolButton" name="toolCursorGraph">
+            <widget class="ToolButton" name="tool_cursor_graph">
              <property name="enabled">
               <bool>false</bool>
              </property>
@@ -1569,10 +1557,9 @@
              </property>
              <property name="icon">
               <iconset resource="osdria_app.qrc">
-               <normaloff>:/icons/img/cursor_select_orange@2x.png</normaloff>
-               <normalon>:/icons/img/cursor_normal@2x.png</normalon>
+               <normaloff>:/icons/img/cursor_select@2x.png</normaloff>
                <disabledoff>:/icons/img/cursor_normal@2x.png</disabledoff>
-               <disabledon>:/icons/img/cursor_select_orange@2x.png</disabledon>:/icons/img/cursor_select_orange@2x.png</iconset>
+               <disabledon>:/icons/img/cursor_select_orange@2x.png</disabledon>:/icons/img/cursor_select@2x.png</iconset>
              </property>
              <property name="iconSize">
               <size>
@@ -1589,7 +1576,7 @@
             </widget>
            </item>
            <item>
-            <widget class="ToolButton" name="toolZoomIn">
+            <widget class="ToolButton" name="tool_zoom_in">
              <property name="enabled">
               <bool>false</bool>
              </property>
@@ -1604,10 +1591,9 @@
              </property>
              <property name="icon">
               <iconset resource="osdria_app.qrc">
-               <normaloff>:/icons/img/zoom-in_select_orange@2x.png</normaloff>
-               <normalon>:/icons/img/zoom-in_normal@2x.png</normalon>
+               <normaloff>:/icons/img/zoom-in_select@2x.png</normaloff>
                <disabledoff>:/icons/img/zoom-in_normal@2x.png</disabledoff>
-               <disabledon>:/icons/img/zoom-in_select_orange@2x.png</disabledon>:/icons/img/zoom-in_select_orange@2x.png</iconset>
+               <disabledon>:/icons/img/zoom-in_select_orange@2x.png</disabledon>:/icons/img/zoom-in_select@2x.png</iconset>
              </property>
              <property name="iconSize">
               <size>
@@ -1621,7 +1607,7 @@
             </widget>
            </item>
            <item>
-            <widget class="ToolButton" name="toolZoomOut">
+            <widget class="ToolButton" name="tool_zoom_out">
              <property name="enabled">
               <bool>false</bool>
              </property>
@@ -1642,10 +1628,9 @@
              </property>
              <property name="icon">
               <iconset resource="osdria_app.qrc">
-               <normaloff>:/icons/img/zoom-out_select_orange@2x.png</normaloff>
-               <normalon>:/icons/img/zoom-out_normal@2x.png</normalon>
+               <normaloff>:/icons/img/zoom-out_select@2x.png</normaloff>
                <disabledoff>:/icons/img/zoom-out_normal@2x.png</disabledoff>
-               <disabledon>:/icons/img/zoom-out_select_orange@2x.png</disabledon>:/icons/img/zoom-out_select_orange@2x.png</iconset>
+               <disabledon>:/icons/img/zoom-out_select_orange@2x.png</disabledon>:/icons/img/zoom-out_select@2x.png</iconset>
              </property>
              <property name="iconSize">
               <size>
@@ -1659,7 +1644,7 @@
             </widget>
            </item>
            <item>
-            <widget class="ToolButton" name="toolButton">
+            <widget class="ToolButton" name="tool_zoom_range">
              <property name="enabled">
               <bool>false</bool>
              </property>
@@ -1674,10 +1659,9 @@
              </property>
              <property name="icon">
               <iconset resource="osdria_app.qrc">
-               <normaloff>:/icons/img/zoom-range_select_orange@2x.png</normaloff>
-               <normalon>:/icons/img/zoom-range_normal@2x.png</normalon>
+               <normaloff>:/icons/img/zoom-range_select@2x.png</normaloff>
                <disabledoff>:/icons/img/zoom-range_normal@2x.png</disabledoff>
-               <disabledon>:/icons/img/zoom-range_select_orange@2x.png</disabledon>:/icons/img/zoom-range_select_orange@2x.png</iconset>
+               <disabledon>:/icons/img/zoom-range_select_orange@2x.png</disabledon>:/icons/img/zoom-range_select@2x.png</iconset>
              </property>
              <property name="iconSize">
               <size>
@@ -1710,12 +1694,12 @@
          </widget>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="mainGraph">
+         <layout class="QHBoxLayout" name="main_graph">
           <property name="spacing">
            <number>0</number>
           </property>
           <item>
-           <widget class="QGraphicsView" name="graphView"/>
+           <widget class="QGraphicsView" name="graph_view"/>
           </item>
          </layout>
         </item>

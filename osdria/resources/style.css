@@ -11,11 +11,11 @@ ProjectView * {
     border: 0px;
 }
 
-#toolbarOverview, #toolbarSections, #toolbarDraft, #toolbarGraph, ToolButton {
+#toolbar_overview, #toolbar_sections, #toolbar_draft, #toolbar_graph, ToolButton {
     background-color: #092957;
 }
 
-#titleOverview, #titleSections, #titleDraft, #titleGraph {
+#title_overview, #title_sections, #title_draft, #title_graph {
     color: #fff;
 }
 
@@ -24,7 +24,7 @@ ProjectView * {
     border: 0px;
 }
 
-#mainOverview, #mainSections, #mainDraft, #mainGraph {
+#main_overview, #main_sections, #main_draft, #main_graph {
     background-color: #fff;
 }
 
