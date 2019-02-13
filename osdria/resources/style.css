@@ -1,5 +1,5 @@
 QDialog > QFrame {
-    background-color: #808080;
+    background-color: #d1d1d1;
     border-radius: 10px;
 }
 
@@ -63,25 +63,33 @@ QComboBox QAbstractItemView {
 
 Sidebar {
     background-color: #d1d1d1;
+    padding: 10px;
 }
 
-PropertyWidget > QLabel {
+PropertyView > QLabel, PropertyDialogView QLabel {
     font-size: 16px;
     color: #4f4f4f;
 }
 
-PropertyWidget > QLineEdit, PropertyWidget > QComboBox, PropertyWidget > QPushButton {
+PropertyView > QLineEdit, PropertyDialogView PropertyEdit {
     font-size: 22px;
     color: #fff;
 }
 
-PropertyWidget > QLineEdit {
+PropertyView > QLineEdit, PropertyDialogView PropertyEdit {
     border: 0px;
     padding: 0px;
     background-color: transparent;
 }
 
-PropertyWidget > QPushButton {
+PropertyDialogView QPushButton {
     border: 0px;
-    text-align: left;
+    border-radius: 10px;
+    background-color: #005a9e;
+    color: #fff;
+    font-size: 22px;
+}
+
+#title {
+    font-size: 22px;
 }

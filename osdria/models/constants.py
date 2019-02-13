@@ -66,4 +66,4 @@ class PropType(Enum):
     CONTEXT_MENU"""
     LINE_EDIT = 0
     DIALOG = 1
-    CONTEXT_MENU = 2
+    POPUP_MENU = 2
