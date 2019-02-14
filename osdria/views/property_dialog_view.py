@@ -26,12 +26,12 @@ class PropertyDialogView(QDialog):
         """initialize view"""
         self._ui.title.setText(self._model.name)
         self._line_edits = []
-        for name, value in self._model.values.items():
+        for item in self._model.values:
             label = QLabel(self._ui.frame)
-            label.setText(name)
+            label.setText(item.name)
             line_edit = PropertyEdit(self._ui.frame)
-            line_edit.set_unit(value.unit)
-            line_edit.setText(value.value)
+            line_edit.set_unit(item.unit)
+            line_edit.setText(item.value)
             self._line_edits.append(line_edit)
             self._ui.form_layout.addRow(label, line_edit)
         self._ui.frame.updateGeometry()
@@ -41,5 +41,10 @@ class PropertyDialogView(QDialog):
         value_list = [line_edit.text() for line_edit in self._line_edits]
         self._property_ctrl.set_property_values(value_list)
 
+    def keyPressEvent(self, event):
+        """prevent dialog closing with enter or return key"""
+        if event.key() == Qt.Key_Enter or event.key() == Qt.Key_Return:
+            return
+        super().keyPressEvent(event)
 
 

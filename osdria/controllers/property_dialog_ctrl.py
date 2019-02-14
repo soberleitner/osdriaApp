@@ -8,21 +8,11 @@ class PropertyDialogCtrl(QObject):
     def __init__(self, model):
         super(PropertyDialogCtrl, self).__init__()
         self._model = model
-        self.create_display_value()
 
     def set_property_values(self, value_list):
-        for model_value, dialog_value in zip(self._model.values.values(), value_list):
+        for model_value, dialog_value in zip(self._model.values, value_list):
             model_value.value = dialog_value
-        if self._model.type is PropType.DIALOG:
-            self.create_display_value()
 
-    def create_display_value(self):
-        display_value = ""
-        for value in self._model.values.values():
-            if display_value is "":
-                display_value = value.value
-            else:
-                display_value += ", " + value.value
-            if value.unit is not "":
-                display_value += " " + value.unit
-        self._model.value = display_value
+        # create display value for sub-property properties
+        display_text = ", ".join(map(str, value_list))
+        self._model.value = display_text

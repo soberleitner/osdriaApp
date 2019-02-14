@@ -15,15 +15,12 @@ class PropertyEdit(QLineEdit):
         self._unit = ""
 
     def setText(self, value):
-        print("setText")
         self.add_unit(value)
 
     def set_unit(self, unit):
-        print("set_unit")
         self._unit = unit
 
     def text(self):
-        print("text")
         if self._unit is "":
             return super().text()
         else:
@@ -31,20 +28,19 @@ class PropertyEdit(QLineEdit):
             return super().text().split(" " + self._unit)[0]
 
     def mousePressEvent(self, event):
-        print("mousePressEvent")
         super().setText(self.text())
         self.clicked.emit()
 
     def focusOutEvent(self, event):
-        print("focusOutEvent")
+        super().focusOutEvent(event)
         # add unit
         self.add_unit(super().text())
 
-        super().focusOutEvent(event)
         if self.hasAcceptableInput():
             self.inputFinished.emit(self.text())
 
     def add_unit(self, value):
+        """adding unit to displayed text"""
         displayed_text = value
         if self._unit is not "":
             displayed_text += " " + self._unit

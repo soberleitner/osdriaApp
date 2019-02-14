@@ -1,5 +1,4 @@
 from models.property import *
-from models.constants import PropType
 from models.data_structure import List
 from models.scenario import Scenario
 
@@ -12,16 +11,24 @@ class ModelTemplate(object):
         project_name = PropertyLineEdit(
             "Project Name",
             "Name")
-        project_longitude = PropertyValue("0.0", "")
-        project_latitude = PropertyValue("0.0", "")
+        project_longitude = PropertyValue("Longitude", "0.0", "")
+        project_latitude = PropertyValue("Latitude", "0.0", "")
         project_location = PropertyDialog(
             "Project Location",
-            {"Longitude": project_longitude, "Latitude": project_latitude})
+            List([project_longitude, project_latitude]))
         project_area = PropertyLineEdit(
             "Project Area",
             "0.0",
             "ha")
-        property_list = [project_name, project_location, project_area]
+        timeline_values_1 = List(["3", "5", "10"])
+        timeline_values_2 = List(["30", "50", "100"])
+        timeline_values_3 = List(["300", "500", "1000"])
+        timeline_1 = PropertyValueTimeSeries("Timeline 1", timeline_values_1, "kW")
+        timeline_2 = PropertyValueTimeSeries("Timeline 2", timeline_values_2, "kW")
+        timeline_3 = PropertyValueTimeSeries("Timeline 3", timeline_values_3, "kW")
+        project_timeline = PropertyPopupMenu("Project Timeline",
+                                             List([timeline_1, timeline_2, timeline_3]))
+        property_list = [project_name, project_location, project_area, project_timeline]
 
         return property_list
 

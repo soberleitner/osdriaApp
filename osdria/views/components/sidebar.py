@@ -23,6 +23,7 @@ class Sidebar(QListWidget):
         """retrieve data to display properties"""
         self.clear()
         for prop in property_list:
+            print(type(prop))
             property_ctrl = PropertyCtrl(prop)
             item = PropertyView(self, prop, property_ctrl)
             item_widget = QListWidgetItem(self)

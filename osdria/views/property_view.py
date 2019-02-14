@@ -25,16 +25,17 @@ class PropertyView(QWidget):
                 self._property_ctrl.open_dialog)
         elif self._model.type is PropType.POPUP_MENU:
             self._ui.property_value.clicked.connect(
-                self._property_ctrl.open_popup_menu)
+                lambda: self._property_ctrl.open_popup_menu(
+                    self._ui.property_value))
 
         """listen for model event signals"""
-        self._model.value.value_changed.connect(
+        self._model.value_changed.connect(
             self._ui.property_value.setText)
 
         """initialize view"""
         self._ui.property_name.setText(self._model.name)
-        self._ui.property_value.set_unit(self._model.value.unit)
-        self._ui.property_value.setText(self._model.value.value)
+        self._ui.property_value.set_unit(self._model.unit)
+        self._ui.property_value.setText(self._model.value)
 
         if self._model.type is PropType.LINE_EDIT:
             self._ui.property_value.setReadOnly(False)

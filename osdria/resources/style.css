@@ -87,9 +87,25 @@ PropertyDialogView QPushButton {
     border-radius: 10px;
     background-color: #005a9e;
     color: #fff;
-    font-size: 22px;
+    font-size: 22;
 }
 
 #title {
-    font-size: 22px;
+    font-size: 22;
+}
+
+PropertyPopupView {
+    border: 0px;
+    background-color: #4f4f4f;
+}
+
+PropertyPopupView::item {
+    background-color: transparent;
+    color: #d1d1d1;
+    font-size: 22;
+}
+
+PropertyDialogView::item:selected {
+    border-color: darkblue;
+    background: rgba(100, 100, 100, 150);
 }

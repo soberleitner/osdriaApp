@@ -19,6 +19,15 @@ class List(QObject):
     def __getitem__(self, index):
         return self._list[index]
 
+    def insert(self, index, object_):
+        self._list.insert(index, object_)
+
+    def pop(self, index):
+        return self._list.pop(index)
+
+    def __len__(self):
+        return len(self._list)
+
     def add(self, value):
         self._list.append(value)
         self.list_extended.emit(value)
