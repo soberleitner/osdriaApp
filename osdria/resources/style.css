@@ -28,42 +28,36 @@ ProjectView * {
     background-color: #fff;
 }
 
+Sidebar {
+    background-color: #d1d1d1;
+    padding: 10px;
+}
+
 QComboBox {
-    border: 0px;
     border-radius: 2px;
     background-color: #d1d1d1;
     color: #4f4f4f;
-}
-
-QComboBox:on { /* shift the text when the popup opens */
-    padding-top: 3px;
-    padding-left: 4px;
-}
-
-QComboBox::down-arrow {
-    border: 0px;
-    image: url(":/icons/icons/dropdown_normal@2x.png");
-    width: 10px;
-    height: 10px;
+    padding: 5px;
 }
 
 QComboBox::drop-down {
     border: 0px;
-    subcontrol-origin: padding;
-    subcontrol-position: right;
-    width: 15px;
+}
+
+QComboBox::down-arrow {
+    border: 0px;
+    image: url(":/icons/img/dropdown_normal@2x.png");
+    width: 10px;
 }
 
 QComboBox QAbstractItemView {
-    border: 0px;
-    border-radius: 2px;
-    selection-background-color: white;
     background-color: #d1d1d1;
+    border-radius: 2px;
+    border: 2px solid #d1d1d1;
 }
 
-Sidebar {
-    background-color: #d1d1d1;
-    padding: 10px;
+QComboBox QAbstractItemView {
+    selection-color: black;
 }
 
 PropertyView > QLabel, PropertyDialogView QLabel {
@@ -96,16 +90,16 @@ PropertyDialogView QPushButton {
 
 PropertyPopupView {
     border: 0px;
+    padding: 3px;
+    border-radius: 2px;
     background-color: #4f4f4f;
 }
 
 PropertyPopupView::item {
-    background-color: transparent;
+    border: 0px;
     color: #d1d1d1;
-    font-size: 22;
 }
 
-PropertyDialogView::item:selected {
-    border-color: darkblue;
-    background: rgba(100, 100, 100, 150);
+PropertyPopupView::item:selected {
+    color: #fff;
 }

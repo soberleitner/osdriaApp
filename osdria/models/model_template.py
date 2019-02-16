@@ -34,7 +34,13 @@ class ModelTemplate(object):
 
     @staticmethod
     def scenarios():
-        scenario = Scenario("Base scenario", List())
-        scenario_list = List([scenario])
+        scenario_1 = Scenario("Base scenario", List())
+        scenario_2 = Scenario("Extra long scenario name requiring a lot of space", List())
+        scenario_3 = Scenario("Another scenario", List())
+        scenario_4 = Scenario("Yet, another one", List())
+        scenario_list = PropertyPopupMenu("Scenarios", List([scenario_1,
+                                                             scenario_2,
+                                                             scenario_3,
+                                                             scenario_4]))
 
         return scenario_list

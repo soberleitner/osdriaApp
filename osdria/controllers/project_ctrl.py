@@ -1,5 +1,7 @@
 from PySide2.QtCore import QObject
 from models.constants import OverviewSelection, PageType
+from controllers.property_popup_ctrl import PropertyPopupCtrl
+from views.property_popup_view import PropertyPopupView
 
 
 class ProjectCtrl(QObject):
@@ -11,9 +13,10 @@ class ProjectCtrl(QObject):
     def open_scenario_dialog(self):
         print("open_scenario_dialog")
 
-    def change_scenario(self, index):
-        self._model.current_scenario = self._model.scenarios[index]
-        print("change_scenario to: " + self._model.current_scenario.name)
+    def show_scenario_selection(self, parent):
+        popup_ctrl = PropertyPopupCtrl(self._model.scenarios)
+        popup_view = PropertyPopupView(parent, self._model.scenarios, popup_ctrl)
+        popup_view.show_popup()
 
     def run_optimization(self):
         print("run_optimization")

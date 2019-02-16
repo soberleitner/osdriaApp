@@ -1,4 +1,5 @@
 from PySide2.QtWidgets import *
+from PySide2.QtCore import Qt
 
 from views.project_view_ui import Ui_MainWindow
 from models.constants import OverviewSelection, PageType, SelectConnect, ZoomType
@@ -19,8 +20,9 @@ class ProjectView(QMainWindow):
         # overview toolbar
         self._ui.tool_scenarios.clicked.connect(
             self._project_ctrl.open_scenario_dialog)
-        self._ui.select_scenario.currentIndexChanged.connect(
-            self._project_ctrl.change_scenario)
+        self._ui.scenario_select.clicked.connect(
+            lambda: self._project_ctrl.show_scenario_selection(
+                self._ui.scenario_select))
         self._ui.tool_run.clicked.connect(self._project_ctrl.run_optimization)
         self._ui.tool_export.clicked.connect(
             self._project_ctrl.open_export_dialog)
@@ -76,6 +78,8 @@ class ProjectView(QMainWindow):
         self._model.current_page_changed.connect(
             self._ui.stacked_pages.setCurrentIndex)
         # overview page
+        self._model.scenarios.value_changed.connect(
+            self._ui.scenario_select.setText)
         self._model.overview_selection_changed.connect(
             self.on_selection_change)
         self._model.overview_properties_changed.connect(
@@ -103,6 +107,9 @@ class ProjectView(QMainWindow):
 
         """initialise view"""
         self._ui.stacked_pages.setCurrentIndex(self._model.current_page.value)
+        self._ui.scenario_select.setReadOnly(True)
+        self._ui.scenario_select.set_popup(True)
+        self._ui.scenario_select.setText(self._model.scenarios.value)
         self._ui.sidebar_overview.load_data(self._model.overview_properties)
 
     def on_selection_change(self, selection):

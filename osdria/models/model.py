@@ -18,7 +18,6 @@ class Model(QObject):
     @signal: overview_selection_changed(str)
     @signal: overview_properties_changed(List)
     @signal: scenarios_changed()
-    @signal: current_scenario_changed()
     @signal: current_section_changed()
     @signal: energy_elements_changed()
     @signal: water_elements_changed()
@@ -36,7 +35,6 @@ class Model(QObject):
     overview_selection_changed = Signal(int)
     overview_properties_changed = Signal(List)
     scenarios_changed = Signal()
-    current_scenario_changed = Signal(QObject)
     current_section_changed = Signal(str)
     current_page_changed = Signal(int)
     energy_elements_changed = Signal()
@@ -123,15 +121,6 @@ class Model(QObject):
     def scenarios(self, value):
         self._scenarios = value
         self.scenarios_changed.emit()
-
-    @property
-    def current_scenario(self):
-        return self._current_scenario
-
-    @current_scenario.setter
-    def current_scenario(self, value):
-        self._current_scenario = value
-        self.current_scenario_changed.emit(value)
 
     @property
     def current_section(self):

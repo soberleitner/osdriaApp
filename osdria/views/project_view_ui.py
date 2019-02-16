@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'project_view.ui',
 # licensing of 'project_view.ui' applies.
 #
-# Created: Tue Feb 12 14:32:31 2019
+# Created: Sat Feb 16 12:46:37 2019
 #      by: pyside2-uic  running on PySide2 5.12.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -63,31 +63,26 @@ class Ui_MainWindow(object):
         self.tool_scenarios.setToolButtonStyle(QtCore.Qt.ToolButtonIconOnly)
         self.tool_scenarios.setObjectName("tool_scenarios")
         self.horizontalLayout.addWidget(self.tool_scenarios)
-        self.select_scenario = QtWidgets.QComboBox(self.toolbar_overview)
+        self.scenario_select = PropertyEdit(self.toolbar_overview)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.select_scenario.sizePolicy().hasHeightForWidth())
-        self.select_scenario.setSizePolicy(sizePolicy)
-        self.select_scenario.setMinimumSize(QtCore.QSize(200, 30))
+        sizePolicy.setHeightForWidth(self.scenario_select.sizePolicy().hasHeightForWidth())
+        self.scenario_select.setSizePolicy(sizePolicy)
+        self.scenario_select.setMinimumSize(QtCore.QSize(200, 30))
+        self.scenario_select.setMaximumSize(QtCore.QSize(200, 30))
         font = QtGui.QFont()
         font.setFamily("Arial")
         font.setPointSize(22)
-        self.select_scenario.setFont(font)
-        self.select_scenario.setEditable(False)
-        self.select_scenario.setMaxVisibleItems(5)
-        self.select_scenario.setMaxCount(10)
-        self.select_scenario.setSizeAdjustPolicy(QtWidgets.QComboBox.AdjustToMinimumContentsLength)
-        self.select_scenario.setIconSize(QtCore.QSize(0, 0))
-        self.select_scenario.setFrame(True)
-        self.select_scenario.setObjectName("select_scenario")
-        self.select_scenario.addItem("")
-        self.select_scenario.addItem("")
-        self.horizontalLayout.addWidget(self.select_scenario)
+        self.scenario_select.setFont(font)
+        self.scenario_select.setReadOnly(True)
+        self.scenario_select.setObjectName("scenario_select")
+        self.horizontalLayout.addWidget(self.scenario_select)
         self.tool_run = ToolButton(self.toolbar_overview)
         self.tool_run.setEnabled(False)
         self.tool_run.setMinimumSize(QtCore.QSize(50, 50))
         self.tool_run.setBaseSize(QtCore.QSize(50, 50))
+        self.tool_run.setLocale(QtCore.QLocale(QtCore.QLocale.English, QtCore.QLocale.Germany))
         icon1 = QtGui.QIcon()
         icon1.addPixmap(QtGui.QPixmap(":/icons/img/run_select@2x.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         icon1.addPixmap(QtGui.QPixmap(":/icons/img/run_normal@2x.png"), QtGui.QIcon.Disabled, QtGui.QIcon.Off)
@@ -556,14 +551,11 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
         self.stacked_pages.setCurrentIndex(0)
-        self.select_scenario.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QtWidgets.QApplication.translate("MainWindow", "MainWindow", None, -1))
-        self.select_scenario.setCurrentText(QtWidgets.QApplication.translate("MainWindow", "Base Scenario", None, -1))
-        self.select_scenario.setItemText(0, QtWidgets.QApplication.translate("MainWindow", "Base Scenario", None, -1))
-        self.select_scenario.setItemText(1, QtWidgets.QApplication.translate("MainWindow", "Renewable Only", None, -1))
+        self.scenario_select.setText(QtWidgets.QApplication.translate("MainWindow", "Scenario", None, -1))
         self.tool_run.setText(QtWidgets.QApplication.translate("MainWindow", "...", None, -1))
         self.tool_export.setText(QtWidgets.QApplication.translate("MainWindow", "...", None, -1))
         self.title_overview.setText(QtWidgets.QApplication.translate("MainWindow", "Overview", None, -1))
@@ -584,8 +576,9 @@ class Ui_MainWindow(object):
         self.tool_zoom_out.setText(QtWidgets.QApplication.translate("MainWindow", "...", None, -1))
         self.tool_zoom_range.setText(QtWidgets.QApplication.translate("MainWindow", "...", None, -1))
 
-from views.components.section_selector import SectionSelector
 from views.components.sidebar import Sidebar
+from views.components.section_selector import SectionSelector
 from views.components.tool_button import ToolButton
+from views.components.property_edit import PropertyEdit
 import osdria_app_rc
 import osdria_app_rc

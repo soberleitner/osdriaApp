@@ -1,4 +1,5 @@
 from PySide2.QtCore import Signal
+from PySide2.QtGui import QIcon, QPixmap
 from PySide2.QtWidgets import QLineEdit
 
 
@@ -13,6 +14,7 @@ class PropertyEdit(QLineEdit):
         super(PropertyEdit, self).__init__(parent)
         self.returnPressed.connect(self.clearFocus)
         self._unit = ""
+        self._popup = False
 
     def setText(self, value):
         self.add_unit(value)
@@ -27,9 +29,19 @@ class PropertyEdit(QLineEdit):
             # remove unit
             return super().text().split(" " + self._unit)[0]
 
+    def is_popup(self):
+        return self._popup
+
+    def set_popup(self, value):
+        self._popup = value
+        popup_action = self.addAction(QIcon(QPixmap(":/icons/img/dropdown_normal@2x.png")),
+                                      QLineEdit.TrailingPosition)
+        popup_action.triggered.connect(self.clicked.emit)
+
     def mousePressEvent(self, event):
         super().setText(self.text())
-        self.clicked.emit()
+        if self.isReadOnly():
+            self.clicked.emit()
 
     def focusOutEvent(self, event):
         super().focusOutEvent(event)

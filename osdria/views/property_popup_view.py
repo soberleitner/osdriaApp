@@ -1,7 +1,6 @@
 from PySide2.QtWidgets import *
+from PySide2.QtGui import QFont
 from PySide2.QtCore import QPoint
-
-from views.property_view_ui import Ui_property
 
 
 class PropertyPopupView(QMenu):
@@ -22,6 +21,7 @@ class PropertyPopupView(QMenu):
             popup_action = QAction(choice.name, self.parent())
             popup_action.setData(index + 1)
             self.addAction(popup_action)
+        self.setFont(self.parent().font())
 
     def show_popup(self):
         """override popup function"""

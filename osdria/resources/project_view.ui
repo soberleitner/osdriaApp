@@ -168,7 +168,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QComboBox" name="select_scenario">
+            <widget class="PropertyEdit" name="scenario_select">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -181,49 +181,30 @@
                <height>30</height>
               </size>
              </property>
+             <property name="maximumSize">
+              <size>
+               <width>200</width>
+               <height>30</height>
+              </size>
+             </property>
              <property name="font">
               <font>
                <family>Arial</family>
                <pointsize>22</pointsize>
               </font>
              </property>
-             <property name="editable">
-              <bool>false</bool>
+             <property name="locale">
+              <locale language="English" country="Germany"/>
              </property>
-             <property name="currentText">
-              <string>Base Scenario</string>
+             <property name="text">
+              <string>Scenario</string>
              </property>
-             <property name="currentIndex">
-              <number>0</number>
-             </property>
-             <property name="maxVisibleItems">
-              <number>5</number>
-             </property>
-             <property name="maxCount">
-              <number>10</number>
-             </property>
-             <property name="sizeAdjustPolicy">
-              <enum>QComboBox::AdjustToMinimumContentsLength</enum>
-             </property>
-             <property name="iconSize">
-              <size>
-               <width>0</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="frame">
+             <property name="readOnly">
               <bool>true</bool>
              </property>
-             <item>
-              <property name="text">
-               <string>Base Scenario</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Renewable Only</string>
-              </property>
-             </item>
+             <property name="clearButtonEnabled">
+              <bool>false</bool>
+             </property>
             </widget>
            </item>
            <item>
@@ -242,6 +223,9 @@
                <width>50</width>
                <height>50</height>
               </size>
+             </property>
+             <property name="locale">
+              <locale language="English" country="Germany"/>
              </property>
              <property name="text">
               <string>...</string>
@@ -1725,6 +1709,11 @@
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>PropertyEdit</class>
+   <extends>QLineEdit</extends>
+   <header>views/components/property_edit.h</header>
+  </customwidget>
   <customwidget>
    <class>ToolButton</class>
    <extends>QToolButton</extends>

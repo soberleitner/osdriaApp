@@ -9,11 +9,14 @@ class Scenario(List):
     @param: name
     @param: property_list
     @signal: name_changed(str)"""
-    #name_changed = Signal(str)
+    name_changed = Signal(str)
 
     def __init__(self, name, property_list):
         super(Scenario, self).__init__(property_list)
         self._name = name
+
+    def __str__(self):
+        return self._name
 
     @property
     def name(self):
