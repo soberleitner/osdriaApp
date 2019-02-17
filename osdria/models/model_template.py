@@ -1,6 +1,9 @@
 from models.property import *
 from models.data_structure import List
 from models.scenario import Scenario
+from models.elements import Elements
+from models.element import *
+from models.constants import *
 
 
 class ModelTemplate(object):
@@ -28,9 +31,29 @@ class ModelTemplate(object):
         timeline_3 = PropertyValueTimeSeries("Timeline 3", timeline_values_3, "kW")
         project_timeline = PropertyPopupMenu("Project Timeline",
                                              List([timeline_1, timeline_2, timeline_3]))
-        property_list = [project_name, project_location, project_area, project_timeline]
+        property_list = List([project_name, project_location, project_area, project_timeline])
 
         return property_list
+
+    @staticmethod
+    def project_elements():
+        sub_com_1 = SubCommodity("General Electricity")
+        sub_com_2 = SubCommodity("Irrigation Water")
+        sub_com_3 = SubCommodity("Domestic Water")
+        commodity_1 = Commodity("Electricity", "", List([sub_com_1]))
+        commodity_2 = Commodity("Water", "", List([sub_com_2, sub_com_3]))
+        core_1 = ProcessCore()
+        core_1.category = ProcessCategory.SUPPLY
+        core_1.section = OverviewSelection.ENERGY
+        core_1.properties = List([])
+        core_2 = ProcessCore()
+        process_1 = Process("Photovoltaic system 1", QPoint(0, 0), core_1)
+        process_2 = Process("Water Pump 1", QPoint(50, 0), core_2)
+        commodity_list = List([commodity_1, commodity_2])
+        process_list = List([process_1, process_2])
+        elements_list = Elements(commodity_list, process_list)
+
+        return elements_list
 
     @staticmethod
     def scenarios():

@@ -29,14 +29,14 @@ class WelcomeView(QDialog):
 
     def mousePressEvent(self, event):
         if event.button() is Qt.LeftButton:
-            self.relativeCursorPosition = self.pos() - event.globalPos()
-            self.leftClick = True
+            self.relative_cursor_position = self.pos() - event.globalPos()
+            self.left_click = True
 
     def mouseReleaseEvent(self, event):
         if event.button() is Qt.LeftButton:
-            self.leftClick = False
+            self.left_click = False
 
     def mouseMoveEvent(self, event):
         """move dialog with mouse clicked move"""
         if self.leftClick:
-            self.move(event.globalPos() + self.relativeCursorPosition)
+            self.move(event.globalPos() + self.relative_cursor_position)

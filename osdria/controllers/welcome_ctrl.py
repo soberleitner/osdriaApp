@@ -4,7 +4,8 @@ from PySide2.QtWidgets import *
 
 import resources.appTexts as txt
 
-FILE_EXTENSION = "OSCAR files (*.pdf)"
+FILE_EXTENSION = ".opf"
+FILE_OPEN = "OSCAR files (*" + FILE_EXTENSION + ")"
 
 
 class WelcomeCtrl(QObject):
@@ -30,13 +31,15 @@ class WelcomeCtrl(QObject):
         self.dialog = QFileDialog(ui_dialog._ui.frame_open,
                                   txt.OPEN_PROJECT['sub'])
         self.dialog.setAcceptMode(QFileDialog.AcceptOpen)
-        self.dialog.setNameFilter(FILE_EXTENSION)
+        self.dialog.setNameFilter(FILE_OPEN)
         self.dialog.accepted.connect(
             lambda: self.close_dialog(False, ui_dialog))
         self.dialog.open()
 
     def close_dialog(self, new_project, dialog):
         self._filename = self.dialog.selectedFiles()[0]
+        self._filename = self._filename.split(FILE_EXTENSION)[0]
+        self._filename = self._filename + FILE_EXTENSION
         self._new_project = new_project
         dialog.accept()
 

@@ -6,6 +6,8 @@ from models.element import *
 from models.data_structure import *
 from models.model_template import *
 
+# set unique identifier for OSDRIA file
+FILE_TYPE = 0xA0B1C2D3
 
 class Model(QObject):
     """application model
@@ -19,10 +21,7 @@ class Model(QObject):
     @signal: overview_properties_changed(List)
     @signal: scenarios_changed()
     @signal: current_section_changed()
-    @signal: energy_elements_changed()
-    @signal: water_elements_changed()
-    @signal: food_elements_changed()
-    @signal: business_elements_changed()
+    @signal: project_elements_changed()
     @signal: overview_sidebar_out_changed(Boolean)
     @signal: sections_sidebar_out_changed(Boolean)
     @signal: draft_sidebar_out_changed(Boolean)
@@ -37,10 +36,7 @@ class Model(QObject):
     scenarios_changed = Signal()
     current_section_changed = Signal(str)
     current_page_changed = Signal(int)
-    energy_elements_changed = Signal()
-    water_elements_changed = Signal()
-    food_elements_changed = Signal()
-    business_elements_changed = Signal()
+    project_elements_changed = Signal()
     overview_sidebar_out_changed = Signal(bool)
     sections_sidebar_out_changed = Signal(bool)
     draft_sidebar_out_changed = Signal(bool)
@@ -49,20 +45,21 @@ class Model(QObject):
     draft_select_mode_changed = Signal(int)
     graph_zoom_mode_changed = Signal(int)
 
-    def __init__(self, filename, new_project=False):
+    def __init__(self, file_name, new_project=False):
         """initialise new or load existing model"""
         super(Model, self).__init__()
-        self._filename = filename
 
         self._current_page = PageType.OVERVIEW
-        self._current_section = PageType.OVERVIEW.name.title()
+        self._current_section = self._current_page.name.title()
         self._overview_selection = OverviewSelection.OVERVIEW
         self._overview_properties = ModelTemplate.overview_properties()
         self._scenarios = ModelTemplate.scenarios()
+        #self._project_elements = ModelTemplate.project_elements()
         self._overview_sidebar_out = False
         self._sections_sidebar_out = False
         self._draft_sidebar_out = False
 
+        self._project_file = QFile(file_name)
         if new_project is True:
             self.save()
         else:
@@ -70,18 +67,51 @@ class Model(QObject):
 
     def save(self):
         """save model to file"""
+        self._project_file.open(QIODevice.WriteOnly)
+        data_output = QDataStream(self._project_file)
+
+        # set checkable data
+        data_output.setVersion(QDataStream.Qt_5_6)
+        data_output.writeUInt32(FILE_TYPE)
+
+        # write model data to file
+        data_output.writeUInt32(self._current_page.value)
+        data_output.writeUInt32(self._overview_selection.value)
+        self._overview_properties.write(data_output)
+
+
+        # data_output << self._overview_properties
+        #             << self._scenarios
+        #             << self._overview_sidebar_out
+        #             << self._sections_sidebar_out
+        #             << self._draft_sidebar_out
+        self._project_file.close()
 
     def load(self):
         """load model to file"""
+        self._project_file.open(QIODevice.ReadOnly)
+        data_input = QDataStream(self._project_file)
 
-    @property
-    def filename(self):
-        return self._filename
+        # check for correct file
+        version = data_input.version()
+        file_type = data_input.readUInt32()
+        if data_input.version() != QDataStream.Qt_5_6:
+            raise RuntimeError
+        if file_type != FILE_TYPE:
+            raise RuntimeError
 
-    @filename.setter
-    def filename(self, value):
-        self._filename = value
-        self.filename_changed.emit(value)
+        # read file data to model
+        self._current_page = PageType(data_input.readUInt32())
+        self._current_section = self._current_page.name.title()
+        self._overview_selection = OverviewSelection(data_input.readUInt32())
+        self._overview_properties.read(data_input)
+
+        # data_input << self._overview_properties
+        #            << self._scenarios
+        #            << self._overview_sidebar_out
+        #            << self._sections_sidebar_out
+        #            << self._draft_sidebar_out
+        self._project_file.close()
 
     @property
     def current_page(self):
@@ -132,40 +162,13 @@ class Model(QObject):
         self.current_section_changed.emit(value)
 
     @property
-    def energy_elements(self):
-        return self._energy_elements
+    def project_elements(self):
+        return self._project_elements
 
-    @energy_elements.setter
-    def energy_elements(self, value):
-        self._energy_elements = value
-        self.energy_elements_changed.emit()
-
-    @property
-    def water_elements(self):
-        return self._water_elements
-
-    @water_elements.setter
-    def water_elements(self, value):
-        self._water_elements = value
-        self.water_elements_changed.emit()
-
-    @property
-    def food_elements(self):
-        return self._food_elements
-
-    @food_elements.setter
-    def food_elements(self, value):
-        self._food_elements = value
-        self.food_elements_changed.emit()
-
-    @property
-    def business_elements(self):
-        return self._business_elements
-
-    @business_elements.setter
-    def business_elements(self, value):
-        self._business_elements = value
-        self.business_elements_changed.emit()
+    @project_elements.setter
+    def project_elements(self, value):
+        self._project_elements = value
+        self.project_elements_changed.emit()
 
     @property
     def overview_sidebar_out(self):

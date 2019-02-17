@@ -9,12 +9,57 @@ class List(QObject):
     @signal: list_extended(QObject)
     @signal: list_reduced(Int)
     """
-    list_extended = Signal(QObject)
+    list_extended = Signal()
     list_reduced = Signal(int)
 
     def __init__(self, list_input=[]):
         super(List, self).__init__()
         self._list = list_input
+
+    def write(self, output):
+        """write list data to output stream"""
+        output.writeUInt32(len(self._list))
+        for list_element in self._list:
+            element_type = type(list_element)
+            output.writeString(list_element.__class__.__module__)
+            output.writeString(list_element.__class__.__name__)
+            if element_type is str:
+                output.writeString(list_element)
+            elif element_type is int:
+                output.writeUInt32(list_element)
+            elif element_type is float:
+                output.writeFloat(list_element)
+            else:
+                list_element.write(output)
+
+    def read(self, input_):
+        """read list data from input stream"""
+        list_lengths = input_.readUInt32()
+        self._list = []
+        for index in range(list_lengths):
+            # identify class of list element
+            module_name = input_.readString()
+            class_name = input_.readString()
+            submodules = module_name.split(".")
+            if len(submodules) >= 2:
+                module = __import__(module_name, fromlist=[submodules[1]])
+            else:
+                module = __import__(module_name)
+            element_class = getattr(module, class_name)
+
+            # distinguish between class type of list element
+            if element_class == str:
+                element = input_.readString()
+            elif element_class == int:
+                element = input_.readUInt32()
+            elif element_class == float:
+                element = input_.readFloat()
+            else:
+                element = element_class()
+                element.read(input_)
+
+            # append element to list
+            self._list.append(element)
 
     def __getitem__(self, index):
         return self._list[index]
@@ -30,7 +75,7 @@ class List(QObject):
 
     def add(self, value):
         self._list.append(value)
-        self.list_extended.emit(value)
+        self.list_extended.emit()
 
     def remove(self, index):
         del self._list[index]

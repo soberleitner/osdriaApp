@@ -26,6 +26,6 @@ class PropertyPopupView(QMenu):
     def show_popup(self):
         """override popup function"""
         height = self.parent().height()
-        position = self.parent().mapToGlobal(QPoint(0, height))
+        position = self.parent().mapToGlobal(QPoint(0, height + 5))
         self.popup(position)
 

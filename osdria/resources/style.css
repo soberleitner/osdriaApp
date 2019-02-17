@@ -33,31 +33,10 @@ Sidebar {
     padding: 10px;
 }
 
-QComboBox {
+#toolbar_overview PropertyEdit {
     border-radius: 2px;
     background-color: #d1d1d1;
     color: #4f4f4f;
-    padding: 5px;
-}
-
-QComboBox::drop-down {
-    border: 0px;
-}
-
-QComboBox::down-arrow {
-    border: 0px;
-    image: url(":/icons/img/dropdown_normal@2x.png");
-    width: 10px;
-}
-
-QComboBox QAbstractItemView {
-    background-color: #d1d1d1;
-    border-radius: 2px;
-    border: 2px solid #d1d1d1;
-}
-
-QComboBox QAbstractItemView {
-    selection-color: black;
 }
 
 PropertyView > QLabel, PropertyDialogView QLabel {

@@ -13,7 +13,7 @@ class PropertyValue(QObject):
     name_changed = Signal(str)
     value_changed = Signal(str)
 
-    def __init__(self, name, value, unit):
+    def __init__(self, name="", value="", unit=""):
         super().__init__()
         self._name = name
         self._value = value
@@ -25,6 +25,18 @@ class PropertyValue(QObject):
         if self._unit != "":
             display_value += " " + self._unit
         return display_value
+
+    def write(self, output):
+        """write data to output stream"""
+        output.writeString(self._name)
+        output.writeString(self._value)
+        output.writeString(self._unit)
+
+    def read(self, input_):
+        """read data from input stream"""
+        self._name = input_.readString()
+        self._value = input_.readString()
+        self._unit = input_.readString()
 
     @property
     def name(self):
@@ -48,6 +60,10 @@ class PropertyValue(QObject):
     def unit(self):
         return self._unit
 
+    @unit.setter
+    def unit(self, value):
+        self._unit = value
+
 
 class PropertyValueTimeSeries(PropertyValue):
     """data stored for property value representing a times series
@@ -59,9 +75,21 @@ class PropertyValueTimeSeries(PropertyValue):
     name_changed = Signal(str)
     value_changed = Signal()
 
-    def __init__(self, name, value, unit):
+    def __init__(self, name="", value=[], unit=""):
         super().__init__(name, "", unit)
-        self._value = value
+        self._value = List(value)
+
+    def write(self, output):
+        """write data to output stream"""
+        output.writeString(super().name)
+        self._value.write(output)
+        output.writeString(super().unit)
+
+    def read(self, input_):
+        """read data from input stream"""
+        PropertyValue.name.fset(self, input_.readString())
+        self._value.read(input_)
+        PropertyValue.unit.fset(self, input_.readString())
 
     @property
     def value(self):
@@ -83,7 +111,7 @@ class PropertyLineEdit(PropertyValue):
     value_changed = Signal(str)
     type = PropType.LINE_EDIT
 
-    def __init__(self, name, value, unit=""):
+    def __init__(self, name="", value="", unit=""):
         super().__init__(name, value, unit)
 
 
@@ -97,12 +125,22 @@ class PropertyDialog(PropertyLineEdit):
     values_changed = Signal(List)
     type = PropType.DIALOG
 
-    def __init__(self, name, values):
+    def __init__(self, name="", values=[]):
         super().__init__(name, "")
         self._values = List(values)
         # create display value for sub-property properties
         display_text = ", ".join(map(str, values))
         PropertyDialog.value.fset(self, display_text)
+
+    def write(self, output):
+        """write data to output stream"""
+        super().write(output)
+        self._values.write(output)
+
+    def read(self, input_):
+        """read data from input stream"""
+        super().read(input_)
+        self._values.read(input_)
 
     @property
     def values(self):
@@ -126,9 +164,22 @@ class PropertyPopupMenu(PropertyLineEdit):
     choices_changed = Signal()
     type = PropType.POPUP_MENU
 
-    def __init__(self, name, choices=[]):
-        super().__init__(name, choices[0].name)
-        self._choices = choices
+    def __init__(self, name="", choices=[]):
+        if choices:
+            super().__init__(name, choices[0].name)
+        else:
+            super().__init__(name, "")
+        self._choices = List(choices)
+
+    def write(self, output):
+        """write data to output stream"""
+        super().write(output)
+        self._choices.write(output)
+
+    def read(self, input_):
+        """read data from input stream"""
+        super().read(input_)
+        self._choices.read(input_)
 
     @property
     def choices(self):

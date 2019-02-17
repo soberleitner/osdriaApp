@@ -106,7 +106,7 @@ class ProjectView(QMainWindow):
             self.on_commodity_change)
 
         """initialise view"""
-        self._ui.stacked_pages.setCurrentIndex(self._model.current_page.value)
+        self._ui.stacked_pages.setCurrentIndex(OverviewSelection.OVERVIEW.value)
         self._ui.scenario_select.setReadOnly(True)
         self._ui.scenario_select.set_popup(True)
         self._ui.scenario_select.setText(self._model.scenarios.value)
@@ -151,3 +151,7 @@ class ProjectView(QMainWindow):
             self._ui.title_graph.setText(commodity.name)
         else:
             self._ui.tool_graph.hide()
+
+    def closeEvent(self, event):
+        print("closeEvent")
+        self._model.save()
