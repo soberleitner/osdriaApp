@@ -4,7 +4,7 @@ OSDRIA - Optimization Software for developing rural infrastructure in Africa - i
 
 ### Installation
 
-Follow these step to run the application:
+Follow these stepsto run the application:
 
 1. Install [Anaconda](https://www.anaconda.com/distribution/#download-section) for Python 3.7
 2. Install the Python package **PySide2** with the following Command Line entry:
