@@ -11,6 +11,5 @@ class PropertyPopupCtrl(QObject):
 
     def set_popup_value(self, action):
         """move selected item to beginning of list and set """
-        index = action.data()
-        self._model.choices.insert(0, self._model.choices.pop(index))
-        self._model.value = self._model.choices[0].name
+        print(id(action.data()))
+        self._model.value = action.data()

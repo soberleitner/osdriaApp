@@ -1,7 +1,11 @@
 from PySide2.QtCore import QObject
 from models.constants import OverviewSelection, PageType
+from models.property import PropertyPopupMenu
 from controllers.property_popup_ctrl import PropertyPopupCtrl
+from controllers.process_dialog_ctrl import ProcessDialogCtrl
 from views.property_popup_view import PropertyPopupView
+from views.process_dialog_view import ProcessDialogView
+
 
 
 class ProjectCtrl(QObject):
@@ -9,6 +13,20 @@ class ProjectCtrl(QObject):
     def __init__(self, model):
         super(ProjectCtrl, self).__init__()
         self._model = model
+
+    def save_model(self):
+        self._model.save()
+
+    def open_commodity_dialog(self):
+        print("open_commodity_dialog")
+
+    def open_process_dialog(self):
+        dialog_model = PropertyPopupMenu("Process Cores", self._model.process_cores)
+        process_ctrl = ProcessDialogCtrl(dialog_model)
+        process_view = ProcessDialogView(dialog_model, process_ctrl)
+        print("before process view exec")
+        process_view.exec_()
+        print("after process view exec")
 
     def open_scenario_dialog(self):
         print("open_scenario_dialog")

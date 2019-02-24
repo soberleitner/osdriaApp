@@ -31,7 +31,10 @@ class ModelTemplate(object):
         timeline_3 = PropertyValueTimeSeries("Timeline 3", timeline_values_3, "kW")
         project_timeline = PropertyPopupMenu("Project Timeline",
                                              List([timeline_1, timeline_2, timeline_3]))
-        property_list = List([project_name, project_location, project_area, project_timeline])
+        property_list = Dict({'name': project_name,
+                              'location': project_location,
+                              'area': project_area,
+                              'timeline': project_timeline})
 
         return property_list
 
@@ -67,3 +70,7 @@ class ModelTemplate(object):
                                                              scenario_4]))
 
         return scenario_list
+
+    @staticmethod
+    def process_cores():
+        return List([])

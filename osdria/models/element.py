@@ -10,46 +10,74 @@ COMMODITY_NAME = "Commodity Name"
 
 class ProcessCore(QObject):
     """data representing the process core
-    @signal: icon_changed(QIcon)
-    @signal: category_changed(ProcessCategory)
-    @signal: objective_function_changed(str)"""
+    @signal: name_changed()
+    @signal: icon_changed()
+    @signal: category_changed()
+    @signal: section_changed()
+    @signal: objective_function_changed()
+    @signal: constraints_changed()"""
+    name_changed = Signal()
     icon_changed = Signal()
     category_changed = Signal()
     section_changed = Signal()
     objective_function_changed = Signal()
+    constraints_changed = Signal()
 
     def __init__(self):
         super(ProcessCore, self).__init__()
+        self._name = ""
         self._icon = QIcon()
         self._category = ProcessCategory.SUPPLY
         self._section = OverviewSelection.ENERGY
-        self._properties = List()
+        self.variables = Dict()
+        self.data = Dict()
+        self.properties = Dict()
+        self.inputs = Dict()
+        self.outputs = Dict()
         self._objective_function = ""
-        self._constraints = List()
-        self._inputs = Dict()
-        self._outputs = Dict()
+        self._constraints = ""
 
     def write(self, output):
         """write data to output stream"""
+        output.writeString(self._name)
         output << self._icon
         output.writeUInt32(self._category.value)
         output.writeUInt32(self._section.value)
-        self._properties.write(output)
+        self.variables.write(output)
+        self.data.write(output)
+        self.properties.write(output)
+        self.inputs.write(output)
+        self.outputs.write(output)
         output.writeString(self._objective_function)
-        self._constraints.write(output)
-        self._inputs.write(output)
-        self._outputs.write(output)
+        output.writeString(self._constraints)
 
     def read(self, input_):
         """read data from input stream"""
+        self._name = input_.readString()
         input_ >> self._icon
-        self._category.value = input_.readUInt32()
-        self._section.value = input_.readUInt32()
-        self._properties.read(input_)
+        self._category = ProcessCategory(input_.readUInt32())
+        self._section = OverviewSelection(input_.readUInt32())
+        print(self._category.value)
+        print(self._section.value)
+        self.variables.read(input_)
+        self.data.read(input_)
+        self.properties.read(input_)
+        self.inputs.read(input_)
+        self.outputs.read(input_)
         self._objective_function = input_.readString()
-        self._constraints.read(input_)
-        self._inputs.read(input_)
-        self._outputs.read(input_)
+        self._constraints = input_.readString()
+
+    def __str__(self):
+        return self._name
+
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, value):
+        self._name = value
+        self.name_changed.emit()
 
     @property
     def icon(self):
@@ -105,43 +133,79 @@ class ProcessCore(QObject):
     def constraints(self):
         return self._constraints
 
-    @property
-    def inputs(self):
-        return self._inputs
-
-    @property
-    def outputs(self):
-        return self._outputs
+    @constraints.setter
+    def constraints(self, value):
+        self._constraints = value
+        self.constraints_changed.emit()
 
 
 class Process(QObject):
     """data representing process object
     @param: name(str)
-    @param: section(OverviewSelection)
-    @param: coordinate([Int, Int])
+    @param: coordinate(QVector2D)
     @param: process_core(ProcessCore)
-    @signal: coordinate_changed([Int, Int])
-    @signal: core_changed(ProcessCore)"""
+    @signal: name_changed()
+    @signal: coordinate_changed()
+    @signal: core_changed()"""
+    name_changed = Signal()
     coordinate_changed = Signal()
-    core_changed = Signal()
 
     def __init__(self, name="", coordinate=QVector2D(), process_core=ProcessCore()):
         super(Process, self).__init__()
+        self._name = name
         self._coordinate = coordinate
-        self._core = process_core
-        property_name = self._core.category.name.title() + " Name"
+        self.core = process_core
+        self.inputs = Dict()
+        self.outputs = Dict()
+
+        property_name = self.core.category.name.title() + " Name"
         name_property = Property(property_name, name, PropType.LINE_EDIT)
-        self._core.properties.add(name_property)
+        self.properties = Dict({'name': name_property})
+        self.define_core_properties()
 
     def write(self, output):
         """write data to output stream"""
         output << self._coordinate
-        self._core.write(output)
+        output.writeString(self.core.name)
+        self.inputs.write(output)
+        self.outputs.write(output)
+        self.properties.write(output)
 
     def read(self, input_):
         """read data from input stream"""
         input_ >> self._coordinate
-        self._core.read(input_)
+        self.core = self.define_core(input_.readString())
+        self.inputs.read(input_)
+        self.outputs.read(input_)
+        self.properties.read(input_)
+
+    def __str__(self):
+        return self._name
+
+    def define_core(self, name):
+        """return core by name out of list of cores
+        Question: access to list of cores?"""
+        return ""
+
+    def define_core_properties(self):
+        """initialise properties of ProcessCore as templates"""
+        for name, prop in self.core.properties.items():
+            self.properties[name] = prop.copy()
+
+    def convert(self):
+        """convert objective function and constraints into executable
+        optimization code with property values and input/outputs connections
+        Additionally, error checking for missing inputs & outputs"""
+        pass
+
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, value):
+        self._name = value
+        self.name_changed.emit()
 
     @property
     def coordinate(self):
@@ -152,66 +216,65 @@ class Process(QObject):
         self._coordinate = value
         self.coordinate_changed.emit()
 
-    @property
-    def core(self):
-        return self._core
 
-    @core.setter
-    def core(self, value):
-        self._core = value
-        self.core_changed.emit()
-
-
-class Commodity(List):
+class CommodityType(QObject):
     """data representing commodity object
     @param: name
-    @param: icon
     @param: sub_commodities=[]
     @function: add_sub_commodity(SubCommodity)
     @function: remove_sub_commodity(int)
     @signal: sub_commodities_changed()"""
 
-    def __init__(self, name="", icon=QIcon(), sub_commodities=[]):
-        super(Commodity, self).__init__(sub_commodities)
-        self._icon = icon
+    def __init__(self, name=""):
+        super(CommodityType, self).__init__()
+        self._name = name
         self._coordinates = QVector4D(0, 0, 0, 0)
-        self._sub_commodities = List(sub_commodities)
         self._properties = List()
         self._properties.add(
             Property(COMMODITY_NAME, name, PropType.LINE_EDIT))
 
     def write(self, output):
         """write data to output stream"""
-        output << self._icon
+        output.writeString(self._name)
         output << self._coordinates
-        self._sub_commodities.write(output)
         self._properties.write(output)
 
     def read(self, input_):
         """read data from input stream"""
-        input_ >> self._icon
+        self._name = input_.readString()
         input_ >> self._coordinates
-        self._sub_commodities.read(input_)
         self._properties.read(input_)
 
+    def __str__(self):
+        return self._name
 
-class SubCommodity(QObject):
+
+class Commodity(QObject):
     """data representing a sub commodity
     @param: name
-    @signal: name_changed(str)"""
-    name_changed = Signal(str)
+    @param: com_type(CommodityType)
+    @signal: name_changed()
+    @signal: type_changed()"""
+    name_changed = Signal()
+    type_changed = Signal()
 
-    def __init__(self, name=""):
-        super(SubCommodity, self).__init__()
+    def __init__(self, name="", com_type=CommodityType()):
+        super(Commodity, self).__init__()
         self._name = name
+        self._type = com_type
 
     def write(self, output):
         """write data to output stream"""
         output.writeString(self._name)
+        self._type.write(output)
 
     def read(self, input_):
         """read data from input stream"""
         self._name = input_.readString()
+        self._type.read(input_)
+
+    def __str__(self):
+        return self._name
 
     @property
     def name(self):
@@ -220,4 +283,13 @@ class SubCommodity(QObject):
     @name.setter
     def name(self, value):
         self._name = value
-        self.name_changed.emit(value)
+        self.name_changed.emit()
+
+    @property
+    def com_type(self):
+        return self._name
+
+    @com_type.setter
+    def com_type(self, value):
+        self._type = value
+        self.type_changed.emit()

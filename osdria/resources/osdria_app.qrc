@@ -55,5 +55,6 @@
         <file>img/logo_light_water@2x.png</file>
         <file>img/logo_light@2x.png</file>
         <file>img/logo@2x.png</file>
+        <file>img/process_icon@2x.png</file>
     </qresource>
 </RCC>

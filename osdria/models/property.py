@@ -21,7 +21,7 @@ class PropertyValue(QObject):
 
     def __str__(self):
         """create display value if string is requested"""
-        display_value = self._value
+        display_value = str(self._value)
         if self._unit != "":
             display_value += " " + self._unit
         return display_value
@@ -29,7 +29,7 @@ class PropertyValue(QObject):
     def write(self, output):
         """write data to output stream"""
         output.writeString(self._name)
-        output.writeString(self._value)
+        output.writeString(str(self._value))
         output.writeString(self._unit)
 
     def read(self, input_):
@@ -37,6 +37,10 @@ class PropertyValue(QObject):
         self._name = input_.readString()
         self._value = input_.readString()
         self._unit = input_.readString()
+
+    def copy(self):
+        """return a new property with the same features"""
+        return PropertyValue(self._name, self._value, self._unit)
 
     @property
     def name(self):
@@ -91,6 +95,9 @@ class PropertyValueTimeSeries(PropertyValue):
         self._value.read(input_)
         PropertyValue.unit.fset(self, input_.readString())
 
+    def __str__(self):
+        return super().name
+
     @property
     def value(self):
         return self._value
@@ -115,18 +122,18 @@ class PropertyLineEdit(PropertyValue):
         super().__init__(name, value, unit)
 
 
-class PropertyDialog(PropertyLineEdit):
+class PropertyDialog(PropertyValue):
     """data stored for property with dialog input
     @param: name(str)
     @param: values({name: PropertyValue})
     @signal: name_changed(str)
-    @signal: value_changed(Dict)"""
+    @signal: values_changed(List)"""
     name_changed = Signal(str)
     values_changed = Signal(List)
     type = PropType.DIALOG
 
     def __init__(self, name="", values=[]):
-        super().__init__(name, "")
+        super().__init__(name)
         self._values = List(values)
         # create display value for sub-property properties
         display_text = ", ".join(map(str, values))
@@ -142,6 +149,13 @@ class PropertyDialog(PropertyLineEdit):
         super().read(input_)
         self._values.read(input_)
 
+    def copy(self):
+        """return new PropertyDialog based on original values"""
+        values = List()
+        for value in self.values:
+            values.add(PropertyValue(value.name, value.value, value.unit))
+        return PropertyDialog(super().name, values)
+
     @property
     def values(self):
         return self._values
@@ -152,7 +166,7 @@ class PropertyDialog(PropertyLineEdit):
         self.values_changed.emit(value)
 
 
-class PropertyPopupMenu(PropertyLineEdit):
+class PropertyPopupMenu(PropertyValue):
     """data stored for property with popup input
     @param: name
     @param: choices(List)
@@ -164,12 +178,15 @@ class PropertyPopupMenu(PropertyLineEdit):
     choices_changed = Signal()
     type = PropType.POPUP_MENU
 
-    def __init__(self, name="", choices=[]):
-        if choices:
-            super().__init__(name, choices[0].name)
+    def __init__(self, name="", choices=List(), value=None):
+        if choices.list:
+            if value:
+                super().__init__(name, value)
+            else:
+                super().__init__(name, choices[0])
         else:
-            super().__init__(name, "")
-        self._choices = List(choices)
+            super().__init__(name)
+        self._choices = choices
 
     def write(self, output):
         """write data to output stream"""
@@ -180,6 +197,13 @@ class PropertyPopupMenu(PropertyLineEdit):
         """read data from input stream"""
         super().read(input_)
         self._choices.read(input_)
+        # get object from choices list based on saved name in value
+        value = list(filter(lambda x: str(x) == super(PropertyPopupMenu, self).value, self._choices))[0]
+        PropertyValue.value.fset(self, value)
+
+    def copy(self):
+        """return new PropertyPopupMenu based on original data"""
+        return PropertyPopupMenu(super().name, self.choices)
 
     @property
     def choices(self):

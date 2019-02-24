@@ -43,7 +43,7 @@
      <property name="font">
       <font>
        <family>Arial</family>
-       <pointsize>22</pointsize>
+       <pointsize>18</pointsize>
       </font>
      </property>
      <property name="locale">
@@ -59,7 +59,7 @@
      <property name="font">
       <font>
        <family>Arial</family>
-       <pointsize>18</pointsize>
+       <pointsize>22</pointsize>
       </font>
      </property>
      <property name="styleSheet">

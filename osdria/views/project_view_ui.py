@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'project_view.ui',
 # licensing of 'project_view.ui' applies.
 #
-# Created: Sat Feb 16 12:46:37 2019
+# Created: Sat Feb 23 10:44:43 2019
 #      by: pyside2-uic  running on PySide2 5.12.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -13,7 +13,7 @@ from PySide2 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1321, 775)
+        MainWindow.resize(1327, 775)
         MainWindow.setLocale(QtCore.QLocale(QtCore.QLocale.English, QtCore.QLocale.UnitedStates))
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
@@ -75,7 +75,9 @@ class Ui_MainWindow(object):
         font.setFamily("Arial")
         font.setPointSize(22)
         self.scenario_select.setFont(font)
+        self.scenario_select.setLocale(QtCore.QLocale(QtCore.QLocale.English, QtCore.QLocale.Germany))
         self.scenario_select.setReadOnly(True)
+        self.scenario_select.setClearButtonEnabled(False)
         self.scenario_select.setObjectName("scenario_select")
         self.horizontalLayout.addWidget(self.scenario_select)
         self.tool_run = ToolButton(self.toolbar_overview)
@@ -542,12 +544,39 @@ class Ui_MainWindow(object):
         self.verticalLayout_3.addWidget(self.stacked_pages)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar()
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1321, 22))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1327, 22))
         self.menubar.setObjectName("menubar")
+        self.menu_file = QtWidgets.QMenu(self.menubar)
+        self.menu_file.setObjectName("menu_file")
+        self.menu_model = QtWidgets.QMenu(self.menubar)
+        self.menu_model.setObjectName("menu_model")
+        self.menu_run = QtWidgets.QMenu(self.menubar)
+        self.menu_run.setObjectName("menu_run")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
+        self.action_save = QtWidgets.QAction(MainWindow)
+        self.action_save.setObjectName("action_save")
+        self.action_close = QtWidgets.QAction(MainWindow)
+        self.action_close.setObjectName("action_close")
+        self.action_processes = QtWidgets.QAction(MainWindow)
+        self.action_processes.setObjectName("action_processes")
+        self.action_commodities = QtWidgets.QAction(MainWindow)
+        self.action_commodities.setObjectName("action_commodities")
+        self.action_scenarios = QtWidgets.QAction(MainWindow)
+        self.action_scenarios.setObjectName("action_scenarios")
+        self.action_execute = QtWidgets.QAction(MainWindow)
+        self.action_execute.setObjectName("action_execute")
+        self.menu_file.addAction(self.action_save)
+        self.menu_file.addAction(self.action_close)
+        self.menu_model.addAction(self.action_processes)
+        self.menu_model.addAction(self.action_commodities)
+        self.menu_run.addAction(self.action_scenarios)
+        self.menu_run.addAction(self.action_execute)
+        self.menubar.addAction(self.menu_file.menuAction())
+        self.menubar.addAction(self.menu_model.menuAction())
+        self.menubar.addAction(self.menu_run.menuAction())
 
         self.retranslateUi(MainWindow)
         self.stacked_pages.setCurrentIndex(0)
@@ -575,10 +604,25 @@ class Ui_MainWindow(object):
         self.tool_zoom_in.setText(QtWidgets.QApplication.translate("MainWindow", "...", None, -1))
         self.tool_zoom_out.setText(QtWidgets.QApplication.translate("MainWindow", "...", None, -1))
         self.tool_zoom_range.setText(QtWidgets.QApplication.translate("MainWindow", "...", None, -1))
+        self.menu_file.setTitle(QtWidgets.QApplication.translate("MainWindow", "File", None, -1))
+        self.menu_model.setTitle(QtWidgets.QApplication.translate("MainWindow", "Model", None, -1))
+        self.menu_run.setTitle(QtWidgets.QApplication.translate("MainWindow", "Run", None, -1))
+        self.action_save.setText(QtWidgets.QApplication.translate("MainWindow", "Save", None, -1))
+        self.action_save.setShortcut(QtWidgets.QApplication.translate("MainWindow", "Ctrl+S", None, -1))
+        self.action_close.setText(QtWidgets.QApplication.translate("MainWindow", "Close", None, -1))
+        self.action_close.setShortcut(QtWidgets.QApplication.translate("MainWindow", "Ctrl+Q", None, -1))
+        self.action_processes.setText(QtWidgets.QApplication.translate("MainWindow", "Processes", None, -1))
+        self.action_processes.setShortcut(QtWidgets.QApplication.translate("MainWindow", "Ctrl+Shift+P", None, -1))
+        self.action_commodities.setText(QtWidgets.QApplication.translate("MainWindow", "Commodities", None, -1))
+        self.action_commodities.setShortcut(QtWidgets.QApplication.translate("MainWindow", "Ctrl+Shift+C", None, -1))
+        self.action_scenarios.setText(QtWidgets.QApplication.translate("MainWindow", "Scenarios", None, -1))
+        self.action_scenarios.setShortcut(QtWidgets.QApplication.translate("MainWindow", "Ctrl+Shift+S", None, -1))
+        self.action_execute.setText(QtWidgets.QApplication.translate("MainWindow", "Execute", None, -1))
+        self.action_execute.setShortcut(QtWidgets.QApplication.translate("MainWindow", "Ctrl+R", None, -1))
 
 from views.components.sidebar import Sidebar
+from views.components.property_edit import PropertyEdit
 from views.components.section_selector import SectionSelector
 from views.components.tool_button import ToolButton
-from views.components.property_edit import PropertyEdit
 import osdria_app_rc
 import osdria_app_rc

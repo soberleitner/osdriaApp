@@ -73,6 +73,9 @@ class List(QObject):
     def __len__(self):
         return len(self._list)
 
+    def copy(self):
+        return self._list.copy()
+
     def add(self, value):
         self._list.append(value)
         self.list_extended.emit()
@@ -101,11 +104,64 @@ class Dict(QObject):
         super(Dict, self).__init__()
         self._dict = dict_input
 
+    def write(self, output):
+        """write list data to output stream"""
+        output.writeUInt32(len(self._dict))
+        for name, list_element in self._dict.items():
+            element_type = type(list_element)
+            output.writeString(name)
+            output.writeString(list_element.__class__.__module__)
+            output.writeString(list_element.__class__.__name__)
+            if element_type is str:
+                output.writeString(list_element)
+            elif element_type is int:
+                output.writeUInt32(list_element)
+            elif element_type is float:
+                output.writeFloat(list_element)
+            else:
+                list_element.write(output)
+
+    def read(self, input_):
+        """read list data from input stream"""
+        dict_lengths = input_.readUInt32()
+        self._dict = {}
+        for index in range(dict_lengths):
+            # identify class of list element
+            name = input_.readString()
+            module_name = input_.readString()
+            class_name = input_.readString()
+            submodules = module_name.split(".")
+            if len(submodules) >= 2:
+                module = __import__(module_name, fromlist=[submodules[1]])
+            else:
+                module = __import__(module_name)
+            element_class = getattr(module, class_name)
+
+            # distinguish between class type of list element
+            if element_class == str:
+                element = input_.readString()
+            elif element_class == int:
+                element = input_.readUInt32()
+            elif element_class == float:
+                element = input_.readFloat()
+            else:
+                element = element_class()
+                element.read(input_)
+
+            # append element to list
+            self._dict[name] = element
+
     def items(self):
         return self._dict.items()
 
+    def keys(self):
+        return self._dict.keys()
+
     def values(self):
         return self._dict.values()
+
+    def __len__(self):
+        return len(self._dict)
 
     def add(self, name, value):
         self._dict[name] = value

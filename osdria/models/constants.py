@@ -12,6 +12,10 @@ class ProcessCategory(Enum):
     STORAGE = 2
     DEMAND = 3
 
+    def __str__(self):
+        """return name as lowercase with first letter uppercase"""
+        return self.name.title()
+
 
 class OverviewSelection(Enum):
     """enumeration of the overview selector
@@ -25,6 +29,10 @@ class OverviewSelection(Enum):
     WATER = 2
     FOOD = 3
     BUSINESS = 4
+
+    def __str__(self):
+        """return name as lowercase with first letter uppercase"""
+        return self.name.title()
 
 
 class PageType(Enum):

@@ -2,6 +2,8 @@ from PySide2.QtWidgets import *
 from PySide2.QtGui import QFont
 from PySide2.QtCore import QPoint
 
+from models.data_structure import List
+
 
 class PropertyPopupView(QMenu):
     """view of property popup"""
@@ -15,13 +17,19 @@ class PropertyPopupView(QMenu):
         self.triggered.connect(self._popup_ctrl.set_popup_value)
 
         """initialise view"""
-        for index, choice in enumerate(self._model.choices[1:]):
+        list_without_value = self.get_list_without_value()
+        for choice in list_without_value:
             # create and add action with name of choice and index
             # without first element
-            popup_action = QAction(choice.name, self.parent())
-            popup_action.setData(index + 1)
+            popup_action = QAction(str(choice), self.parent())
+            popup_action.setData(choice)
             self.addAction(popup_action)
         self.setFont(self.parent().font())
+
+    def get_list_without_value(self):
+        popup_list = self._model.choices.copy()
+        popup_list.remove(self._model.value)
+        return popup_list
 
     def show_popup(self):
         """override popup function"""

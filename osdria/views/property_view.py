@@ -30,7 +30,7 @@ class PropertyView(QWidget):
 
         """listen for model event signals"""
         self._model.value_changed.connect(
-            self._ui.property_value.setText)
+            lambda: self._ui.property_value.setText(str(self._model.value)))
 
         """initialize view"""
         self._ui.property_name.setText(self._model.name)

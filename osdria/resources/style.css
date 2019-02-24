@@ -44,23 +44,43 @@ PropertyView > QLabel, PropertyDialogView QLabel {
     color: #4f4f4f;
 }
 
-PropertyView > QLineEdit, PropertyDialogView PropertyEdit {
+PropertyView > QLineEdit, PropertyDialogView PropertyEdit, ProcessDialogView PropertyEdit {
     font-size: 22px;
     color: #fff;
 }
 
-PropertyView > QLineEdit, PropertyDialogView PropertyEdit {
+PropertyEdit:focus, ProcessDialogView QListView:focus {
+    border-color: transparent;
+}
+
+PropertyView > QLineEdit, QDialog PropertyEdit {
     border: 0px;
     padding: 0px;
     background-color: transparent;
 }
 
-PropertyDialogView QPushButton {
+QPushButton, #button_icon {
     border: 0px;
     border-radius: 10px;
     background-color: #005a9e;
     color: #fff;
     font-size: 22;
+}
+
+QDialog ToolButton {
+    border: 0px;
+    background-color: transparent;
+}
+
+ProcessDialogView QLabel {
+    color: #4f4f4f;
+}
+
+ProcessDialogView QListView, #objective_value, #constraints_value {
+    padding: 3px;
+    border: 0px;
+    border-radius: 4px;
+    background-color: white;
 }
 
 #title {

@@ -17,6 +17,17 @@ class ProjectView(QMainWindow):
         self._ui.setupUi(self)
 
         """connect widgets to controller"""
+        # menu bar
+        self._ui.action_save.triggered.connect(self._project_ctrl.save_model)
+        self._ui.action_close.triggered.connect(self.close)
+        self._ui.action_commodities.triggered.connect(
+            self._project_ctrl.open_commodity_dialog)
+        self._ui.action_processes.triggered.connect(
+            self._project_ctrl.open_process_dialog)
+        self._ui.action_scenarios.triggered.connect(
+            self._project_ctrl.open_scenario_dialog)
+        self._ui.action_execute.triggered.connect(
+            self._project_ctrl.run_optimization)
         # overview toolbar
         self._ui.tool_scenarios.clicked.connect(
             self._project_ctrl.open_scenario_dialog)
@@ -79,7 +90,7 @@ class ProjectView(QMainWindow):
             self._ui.stacked_pages.setCurrentIndex)
         # overview page
         self._model.scenarios.value_changed.connect(
-            self._ui.scenario_select.setText)
+            lambda: self._ui.scenario_select.setText(str(self._model.scenarios.value)))
         self._model.overview_selection_changed.connect(
             self.on_selection_change)
         self._model.overview_properties_changed.connect(
@@ -109,12 +120,12 @@ class ProjectView(QMainWindow):
         self._ui.stacked_pages.setCurrentIndex(OverviewSelection.OVERVIEW.value)
         self._ui.scenario_select.setReadOnly(True)
         self._ui.scenario_select.set_popup(True)
-        self._ui.scenario_select.setText(self._model.scenarios.value)
+        self._ui.scenario_select.setText(str(self._model.scenarios.value))
         self._ui.sidebar_overview.load_data(self._model.overview_properties)
 
     def on_selection_change(self, selection):
         self._ui.logo.change_icon(OverviewSelection(selection))
-        self._ui.title_overview.setText(OverviewSelection(selection).name.title())
+        self._ui.title_overview.setText(str(OverviewSelection(selection)))
 
     def on_section_change(self, section):
         self._ui.title_sections.setText(section)
@@ -153,5 +164,4 @@ class ProjectView(QMainWindow):
             self._ui.tool_graph.hide()
 
     def closeEvent(self, event):
-        print("closeEvent")
         self._model.save()

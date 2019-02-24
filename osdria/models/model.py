@@ -7,7 +7,8 @@ from models.data_structure import *
 from models.model_template import *
 
 # set unique identifier for OSDRIA file
-FILE_TYPE = 0xA0B1C2D3
+FILE_TYPE = 0x4F534452
+
 
 class Model(QObject):
     """application model
@@ -54,6 +55,7 @@ class Model(QObject):
         self._overview_selection = OverviewSelection.OVERVIEW
         self._overview_properties = ModelTemplate.overview_properties()
         self._scenarios = ModelTemplate.scenarios()
+        self.process_cores = ModelTemplate.process_cores()
         #self._project_elements = ModelTemplate.project_elements()
         self._overview_sidebar_out = False
         self._sections_sidebar_out = False
@@ -78,13 +80,11 @@ class Model(QObject):
         data_output.writeUInt32(self._current_page.value)
         data_output.writeUInt32(self._overview_selection.value)
         self._overview_properties.write(data_output)
+        print("write process cores")
+        self.process_cores.write(data_output)
 
 
-        # data_output << self._overview_properties
         #             << self._scenarios
-        #             << self._overview_sidebar_out
-        #             << self._sections_sidebar_out
-        #             << self._draft_sidebar_out
         self._project_file.close()
 
     def load(self):
@@ -105,12 +105,10 @@ class Model(QObject):
         self._current_section = self._current_page.name.title()
         self._overview_selection = OverviewSelection(data_input.readUInt32())
         self._overview_properties.read(data_input)
+        print("read process cores")
+        self.process_cores.read(data_input)
 
-        # data_input << self._overview_properties
         #            << self._scenarios
-        #            << self._overview_sidebar_out
-        #            << self._sections_sidebar_out
-        #            << self._draft_sidebar_out
         self._project_file.close()
 
     @property
