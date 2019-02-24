@@ -1,6 +1,6 @@
 ## Welcome to OSDRIA
 
-OSDRIA - Optimization Software for developing rural infrastructure in Africa - is supposed to be an easy-to-use application for optimizing the system design of decentralized Energy-Water-Food concept targeting rural communities in Subsaharan Africa.
+OSDRIA - Optimization Software for developing rural infrastructure in Africa - is supposed to be an easy-to-use application for optimizing the system design of decentralized Energy-Water-Food concepts targeting rural communities in Sub-Sahara Africa.
 
 ### Installation
 
