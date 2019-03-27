@@ -1,10 +1,10 @@
 ## Welcome to OSDRIA
 
-OSDRIA - Optimization Software for developing rural infrastructure in Africa - is supposed to be an easy-to-use application for optimizing the system design of decentralized Energy-Water-Food concept targeting rural communities in Subsaharan Africa.
+OSDRIA - Optimization Software for developing rural infrastructure in Africa - is supposed to be an easy-to-use application for optimizing the system design of decentralized Energy-Water-Food concepts targeting rural communities in Sub-Sahara Africa.
 
 ### Installation
 
-Follow these step to run the application:
+Follow these steps to run the application:
 
 1. Install [Anaconda](https://www.anaconda.com/distribution/#download-section) for Python 3.7
 2. Install the Python package **PySide2** with the following Command Line entry:
