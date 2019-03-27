@@ -35,7 +35,7 @@ class Model(QObject):
     overview_selection_changed = Signal(int)
     overview_properties_changed = Signal(List)
     scenarios_changed = Signal()
-    current_section_changed = Signal(str)
+    current_section_changed = Signal(int)
     current_page_changed = Signal(int)
     project_elements_changed = Signal()
     overview_sidebar_out_changed = Signal(bool)
@@ -51,15 +51,17 @@ class Model(QObject):
         super(Model, self).__init__()
 
         self._current_page = PageType.OVERVIEW
-        self._current_section = self._current_page.name.title()
+        self._current_section = self._current_page
         self._overview_selection = OverviewSelection.OVERVIEW
         self._overview_properties = ModelTemplate.overview_properties()
-        self._scenarios = ModelTemplate.scenarios()
+        self.scenarios = ModelTemplate.scenarios()
+        self.commodities = ModelTemplate.commodities()
+        self.time_series = ModelTemplate.time_series()
         self.process_cores = ModelTemplate.process_cores()
-        #self._project_elements = ModelTemplate.project_elements()
-        self._overview_sidebar_out = False
-        self._sections_sidebar_out = False
-        self._draft_sidebar_out = False
+        self.project_elements = ModelTemplate.project_elements()
+        self._overview_sidebar_out = True
+        self._sections_sidebar_out = True
+        self._draft_sidebar_out = True
 
         self._project_file = QFile(file_name)
         if new_project is True:
@@ -80,11 +82,10 @@ class Model(QObject):
         data_output.writeUInt32(self._current_page.value)
         data_output.writeUInt32(self._overview_selection.value)
         self._overview_properties.write(data_output)
-        print("write process cores")
+        self.commodities.write(data_output)
+        self.time_series.write(data_output)
         self.process_cores.write(data_output)
-
-
-        #             << self._scenarios
+        self.project_elements.write(data_output)
         self._project_file.close()
 
     def load(self):
@@ -105,10 +106,10 @@ class Model(QObject):
         self._current_section = self._current_page.name.title()
         self._overview_selection = OverviewSelection(data_input.readUInt32())
         self._overview_properties.read(data_input)
-        print("read process cores")
+        self.commodities.read(data_input)
+        self.time_series.read(data_input)
         self.process_cores.read(data_input)
-
-        #            << self._scenarios
+        self.project_elements.read(data_input)
         self._project_file.close()
 
     @property
@@ -142,31 +143,16 @@ class Model(QObject):
         self.overview_properties_changed.emit(value)
 
     @property
-    def scenarios(self):
-        return self._scenarios
-
-    @scenarios.setter
-    def scenarios(self, value):
-        self._scenarios = value
-        self.scenarios_changed.emit()
-
-    @property
     def current_section(self):
         return self._current_section
 
     @current_section.setter
     def current_section(self, value):
-        self._current_section = value
-        self.current_section_changed.emit(value)
-
-    @property
-    def project_elements(self):
-        return self._project_elements
-
-    @project_elements.setter
-    def project_elements(self, value):
-        self._project_elements = value
-        self.project_elements_changed.emit()
+        if value in OverviewSelection:
+            self._current_section = value
+            self.current_section_changed.emit(value.value)
+        else:
+            raise AttributeError
 
     @property
     def overview_sidebar_out(self):

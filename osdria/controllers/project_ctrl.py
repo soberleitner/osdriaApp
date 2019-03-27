@@ -1,11 +1,13 @@
 from PySide2.QtCore import QObject
-from models.constants import OverviewSelection, PageType
-from models.property import PropertyPopupMenu
-from controllers.property_popup_ctrl import PropertyPopupCtrl
-from controllers.process_dialog_ctrl import ProcessDialogCtrl
-from views.property_popup_view import PropertyPopupView
-from views.process_dialog_view import ProcessDialogView
 
+from models.constants import OverviewSelection, PageType, SelectConnect
+from models.property import PropertyPopupMenu
+
+from controllers.process_dialog_ctrl import ProcessDialogCtrl
+from controllers.list_dialog_ctrl import ListDialogCtrl
+
+from views.process_dialog_view import ProcessDialogView
+from views.list_dialog_view import ListDialogView
 
 
 class ProjectCtrl(QObject):
@@ -13,28 +15,37 @@ class ProjectCtrl(QObject):
     def __init__(self, model):
         super(ProjectCtrl, self).__init__()
         self._model = model
+        self.connect_model_data(self._model)
+
+    def connect_model_data(self, model):
+        """connect model data with references to other model data when model is loaded from file"""
+        # connect process core in Process instance to ProcessCore instance
+        for process in model.project_elements.process_list:
+            process.core = list(filter(lambda core: core.name == process.core, model.process_cores))[0]
+
+        # todo add necessary model connectors
 
     def save_model(self):
         self._model.save()
 
+    # def open_time_series_dialog(self):
+    #     time_series_ctrl = TimeSeriesDialogCtrl(self._model.time_series)
+    #     time_series_view = TimeSeriesDialogView(self._model.time_series, time_series_ctrl)
+    #     time_series_view.exec_()
+
     def open_commodity_dialog(self):
-        print("open_commodity_dialog")
+        commodities_ctrl = ListDialogCtrl(self._model.commodities)
+        commodities_view = ListDialogView(self._model.commodities, commodities_ctrl)
+        commodities_view.exec_()
 
     def open_process_dialog(self):
         dialog_model = PropertyPopupMenu("Process Cores", self._model.process_cores)
-        process_ctrl = ProcessDialogCtrl(dialog_model)
+        process_ctrl = ProcessDialogCtrl(dialog_model, self._model.commodities)
         process_view = ProcessDialogView(dialog_model, process_ctrl)
-        print("before process view exec")
         process_view.exec_()
-        print("after process view exec")
 
     def open_scenario_dialog(self):
         print("open_scenario_dialog")
-
-    def show_scenario_selection(self, parent):
-        popup_ctrl = PropertyPopupCtrl(self._model.scenarios)
-        popup_view = PropertyPopupView(parent, self._model.scenarios, popup_ctrl)
-        popup_view.show_popup()
 
     def run_optimization(self):
         print("run_optimization")
@@ -54,8 +65,14 @@ class ProjectCtrl(QObject):
         self._model.overview_selection = OverviewSelection(selection_type)
 
     def change_page(self, page):
-        self._model.current_section = self._model.overview_selection.name.title()
+        self._model.current_section = self._model.overview_selection
+        if page == PageType.OVERVIEW:
+            self._model.overview_selection = OverviewSelection.OVERVIEW
+
         self._model.current_page = page
+
+        if page == PageType.DRAFT:
+            self._model.draft_select_mode = SelectConnect.SELECT
 
     def toggle_select_connect(self, select_type):
         self._model.draft_select_mode = select_type

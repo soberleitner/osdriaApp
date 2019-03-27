@@ -39,7 +39,7 @@
        <number>0</number>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="overview">
        <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0">
@@ -559,7 +559,7 @@
            <item>
             <widget class="Sidebar" name="sidebar_overview">
              <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
@@ -578,7 +578,7 @@
              </property>
              <property name="baseSize">
               <size>
-               <width>0</width>
+               <width>260</width>
                <height>0</height>
               </size>
              </property>
@@ -590,6 +590,9 @@
              </property>
              <property name="lineWidth">
               <number>0</number>
+             </property>
+             <property name="horizontalScrollBarPolicy">
+              <enum>Qt::ScrollBarAlwaysOff</enum>
              </property>
              <property name="selectionMode">
               <enum>QAbstractItemView::NoSelection</enum>
@@ -911,10 +914,23 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="QGraphicsView" name="section_view"/>
+           <widget class="SceneView" name="section_view">
+            <property name="verticalScrollBarPolicy">
+             <enum>Qt::ScrollBarAlwaysOff</enum>
+            </property>
+            <property name="horizontalScrollBarPolicy">
+             <enum>Qt::ScrollBarAlwaysOff</enum>
+            </property>
+           </widget>
           </item>
           <item>
            <widget class="Sidebar" name="sidebar_sections">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="maximumSize">
              <size>
               <width>260</width>
@@ -932,6 +948,9 @@
             </property>
             <property name="lineWidth">
              <number>0</number>
+            </property>
+            <property name="horizontalScrollBarPolicy">
+             <enum>Qt::ScrollBarAlwaysOff</enum>
             </property>
            </widget>
           </item>
@@ -1040,7 +1059,7 @@
              <property name="icon">
               <iconset resource="osdria_app.qrc">
                <normaloff>:/icons/img/draft_select@2x.png</normaloff>
-               <disabledoff>:/icons/img/draft_normal@2x.png</disabledoff>:/icons/img/draft_select@2x.png</iconset>
+               <disabledoff>:/icons/img/draft_select_orange@2x.png</disabledoff>:/icons/img/draft_select@2x.png</iconset>
              </property>
              <property name="iconSize">
               <size>
@@ -1262,10 +1281,16 @@
           </property>
           <item>
            <widget class="Sidebar" name="draftbar">
-            <property name="maximumSize">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="baseSize">
              <size>
               <width>260</width>
-              <height>16777215</height>
+              <height>0</height>
              </size>
             </property>
             <property name="frameShadow">
@@ -1274,13 +1299,32 @@
             <property name="lineWidth">
              <number>0</number>
             </property>
+            <property name="horizontalScrollBarPolicy">
+             <enum>Qt::ScrollBarAlwaysOff</enum>
+            </property>
+            <property name="selectionMode">
+             <enum>QAbstractItemView::NoSelection</enum>
+            </property>
            </widget>
           </item>
           <item>
-           <widget class="QGraphicsView" name="draft_view"/>
+           <widget class="SceneView" name="draft_view">
+            <property name="verticalScrollBarPolicy">
+             <enum>Qt::ScrollBarAlwaysOff</enum>
+            </property>
+            <property name="horizontalScrollBarPolicy">
+             <enum>Qt::ScrollBarAlwaysOff</enum>
+            </property>
+           </widget>
           </item>
           <item>
            <widget class="Sidebar" name="sidebar_draft">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="maximumSize">
              <size>
               <width>260</width>
@@ -1292,6 +1336,9 @@
               <width>260</width>
               <height>0</height>
              </size>
+            </property>
+            <property name="horizontalScrollBarPolicy">
+             <enum>Qt::ScrollBarAlwaysOff</enum>
             </property>
            </widget>
           </item>
@@ -1800,6 +1847,11 @@
    <class>Sidebar</class>
    <extends>QListWidget</extends>
    <header>views/components/sidebar.h</header>
+  </customwidget>
+  <customwidget>
+   <class>SceneView</class>
+   <extends>QGraphicsView</extends>
+   <header>views/components/scene_view.h</header>
   </customwidget>
  </customwidgets>
  <resources>

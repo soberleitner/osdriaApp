@@ -32,7 +32,7 @@ class List(QObject):
             else:
                 list_element.write(output)
 
-    def read(self, input_):
+    def read(self, input_, connection_data=None):
         """read list data from input stream"""
         list_lengths = input_.readUInt32()
         self._list = []
@@ -64,6 +64,9 @@ class List(QObject):
     def __getitem__(self, index):
         return self._list[index]
 
+    def __setitem__(self, key, value):
+        self._list[key] = value
+
     def insert(self, index, object_):
         self._list.insert(index, object_)
 
@@ -80,9 +83,9 @@ class List(QObject):
         self._list.append(value)
         self.list_extended.emit()
 
-    def remove(self, index):
-        del self._list[index]
-        self.list_reduced.emit(index)
+    def remove(self, item):
+        self._list.remove(item)
+        self.list_reduced.emit(item)
 
     @property
     def list(self):

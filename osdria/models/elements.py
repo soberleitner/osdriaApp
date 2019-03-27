@@ -16,6 +16,16 @@ class Elements(QObject):
         self._commodity_list = List(commodity_list)
         self._process_list = List(process_list)
 
+    def write(self, output):
+        """write data to output stream"""
+        self._commodity_list.write(output)
+        self._process_list.write(output)
+
+    def read(self, input_):
+        """read data from input stream"""
+        self._commodity_list.read(input_)
+        self._process_list.read(input_)
+
     def add_commodity(self, commodity):
         self._commodity_list.add(commodity)
 

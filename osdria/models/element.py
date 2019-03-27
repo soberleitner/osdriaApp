@@ -29,11 +29,11 @@ class ProcessCore(QObject):
         self._icon = QIcon()
         self._category = ProcessCategory.SUPPLY
         self._section = OverviewSelection.ENERGY
-        self.variables = Dict()
-        self.data = Dict()
-        self.properties = Dict()
-        self.inputs = Dict()
-        self.outputs = Dict()
+        self.variables = List([])
+        self.data = List([])
+        self.properties = List([])
+        self.inputs = List([])
+        self.outputs = List([])
         self._objective_function = ""
         self._constraints = ""
 
@@ -57,8 +57,6 @@ class ProcessCore(QObject):
         input_ >> self._icon
         self._category = ProcessCategory(input_.readUInt32())
         self._section = OverviewSelection(input_.readUInt32())
-        print(self._category.value)
-        print(self._section.value)
         self.variables.read(input_)
         self.data.read(input_)
         self.properties.read(input_)
@@ -147,25 +145,24 @@ class Process(QObject):
     @signal: name_changed()
     @signal: coordinate_changed()
     @signal: core_changed()"""
-    name_changed = Signal()
     coordinate_changed = Signal()
 
-    def __init__(self, name="", coordinate=QVector2D(), process_core=ProcessCore()):
+    def __init__(self, name="", coordinate=QPoint(), process_core=ProcessCore()):
         super(Process, self).__init__()
-        self._name = name
         self._coordinate = coordinate
         self.core = process_core
-        self.inputs = Dict()
-        self.outputs = Dict()
+        self.inputs = List()
+        self.outputs = List()
 
         property_name = self.core.category.name.title() + " Name"
-        name_property = Property(property_name, name, PropType.LINE_EDIT)
-        self.properties = Dict({'name': name_property})
+        name_property = PropertyLineEdit(property_name, name)
+        self.properties = List([name_property])
         self.define_core_properties()
 
     def write(self, output):
         """write data to output stream"""
-        output << self._coordinate
+        output.writeFloat(self._coordinate.x())
+        output.writeFloat(self._coordinate.y())
         output.writeString(self.core.name)
         self.inputs.write(output)
         self.outputs.write(output)
@@ -173,24 +170,21 @@ class Process(QObject):
 
     def read(self, input_):
         """read data from input stream"""
-        input_ >> self._coordinate
-        self.core = self.define_core(input_.readString())
+        x_coordinate = input_.readFloat()
+        y_coordinate = input_.readFloat()
+        self._coordinate = QPoint(x_coordinate, y_coordinate)
+        self.core = input_.readString()
         self.inputs.read(input_)
         self.outputs.read(input_)
         self.properties.read(input_)
 
     def __str__(self):
-        return self._name
-
-    def define_core(self, name):
-        """return core by name out of list of cores
-        Question: access to list of cores?"""
-        return ""
+        return self.name
 
     def define_core_properties(self):
         """initialise properties of ProcessCore as templates"""
-        for name, prop in self.core.properties.items():
-            self.properties[name] = prop.copy()
+        for prop in self.core.properties:
+            self.properties.add(prop.copy())
 
     def convert(self):
         """convert objective function and constraints into executable
@@ -200,12 +194,7 @@ class Process(QObject):
 
     @property
     def name(self):
-        return self._name
-
-    @name.setter
-    def name(self, value):
-        self._name = value
-        self.name_changed.emit()
+        return self.properties[0].value
 
     @property
     def coordinate(self):
@@ -228,21 +217,21 @@ class CommodityType(QObject):
     def __init__(self, name=""):
         super(CommodityType, self).__init__()
         self._name = name
-        self._coordinates = QVector4D(0, 0, 0, 0)
-        self._properties = List()
+        self._coordinate = QPoint(0, 0)
+        self._properties = List([])
         self._properties.add(
-            Property(COMMODITY_NAME, name, PropType.LINE_EDIT))
+            PropertyLineEdit(COMMODITY_NAME, name))
 
     def write(self, output):
         """write data to output stream"""
         output.writeString(self._name)
-        output << self._coordinates
+        output << self._coordinate
         self._properties.write(output)
 
     def read(self, input_):
         """read data from input stream"""
         self._name = input_.readString()
-        input_ >> self._coordinates
+        input_ >> self._coordinate
         self._properties.read(input_)
 
     def __str__(self):
@@ -258,10 +247,10 @@ class Commodity(QObject):
     name_changed = Signal()
     type_changed = Signal()
 
-    def __init__(self, name="", com_type=CommodityType()):
+    def __init__(self, name="", commodity_type=CommodityType()):
         super(Commodity, self).__init__()
         self._name = name
-        self._type = com_type
+        self._type = commodity_type
 
     def write(self, output):
         """write data to output stream"""
@@ -286,10 +275,10 @@ class Commodity(QObject):
         self.name_changed.emit()
 
     @property
-    def com_type(self):
-        return self._name
+    def commodity_type(self):
+        return self._type
 
-    @com_type.setter
-    def com_type(self, value):
+    @commodity_type.setter
+    def commodity_type(self, value):
         self._type = value
         self.type_changed.emit()

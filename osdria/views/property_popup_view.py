@@ -27,12 +27,18 @@ class PropertyPopupView(QMenu):
         self.setFont(self.parent().font())
 
     def get_list_without_value(self):
+        """copy list to delete shown list element without affecting original list"""
+        # check whether value is reference of element in choices list (probably corrupted by file read)
+        if self._model.value not in self._model.choices:
+            self._model.value = list(filter(lambda choice: str(choice) == str(self._model.value),
+                                            self._model.choices))[0]
+
         popup_list = self._model.choices.copy()
         popup_list.remove(self._model.value)
         return popup_list
 
     def show_popup(self):
-        """override popup function"""
+        """override popup function to define location of popup"""
         height = self.parent().height()
         position = self.parent().mapToGlobal(QPoint(0, height + 5))
         self.popup(position)

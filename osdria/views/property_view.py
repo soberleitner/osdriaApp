@@ -1,6 +1,5 @@
 from PySide2.QtWidgets import *
 
-from models.property import *
 from models.constants import PropType
 from views.property_view_ui import Ui_property
 
@@ -17,27 +16,12 @@ class PropertyView(QWidget):
         self._ui.setupUi(self)
 
         """connect widgets to controller"""
-        if self._model.type is PropType.LINE_EDIT:
-            self._ui.property_value.inputFinished.connect(
-                self._property_ctrl.change_property_value)
-        elif self._model.type is PropType.DIALOG:
+        if self._model.type is PropType.DIALOG:
             self._ui.property_value.clicked.connect(
                 self._property_ctrl.open_dialog)
-        elif self._model.type is PropType.POPUP_MENU:
-            self._ui.property_value.clicked.connect(
-                lambda: self._property_ctrl.open_popup_menu(
-                    self._ui.property_value))
 
         """listen for model event signals"""
-        self._model.value_changed.connect(
-            lambda: self._ui.property_value.setText(str(self._model.value)))
 
         """initialize view"""
         self._ui.property_name.setText(self._model.name)
-        self._ui.property_value.set_unit(self._model.unit)
-        self._ui.property_value.setText(self._model.value)
-
-        if self._model.type is PropType.LINE_EDIT:
-            self._ui.property_value.setReadOnly(False)
-        else:
-            self._ui.property_value.setReadOnly(True)
+        self._ui.property_value.set_model(self._model)

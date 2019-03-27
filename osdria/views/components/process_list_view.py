@@ -6,7 +6,6 @@ from models.data_structure import Dict
 class ProcessListView(QListView):
     """define functionality of list views in process dialog"""
     edit_add = Signal([str, int, QObject])
-    #edit_process = Signal(int)
 
     def __init__(self, parent):
         super(ProcessListView, self).__init__(parent)
@@ -20,11 +19,10 @@ class ProcessListView(QListView):
         local_position = event.pos()
         global_position = event.globalPos()
         item = self.indexAt(local_position)
-        print(item)
         context_menu = QMenu()
         if item.isValid():
             edit_action = context_menu.addAction("Edit")
-            edit_action.triggered.connect(lambda: self.edit_add.emit("Edit", item, self.model()))
+            edit_action.triggered.connect(lambda: self.edit_add.emit("Edit", item.row(), self.model()))
             delete_action = context_menu.addAction("Delete")
             delete_action.triggered.connect(lambda: self.model().removeRow(item.row()))
         add_action = context_menu.addAction("Add")
@@ -36,7 +34,7 @@ class ProcessListView(QListView):
 class ListModel(QAbstractListModel):
     """define model for variables list views"""
 
-    def __init__(self, data={}):
+    def __init__(self, data=[]):
         super(ListModel, self).__init__()
         self._data = data
 
@@ -44,32 +42,37 @@ class ListModel(QAbstractListModel):
         return len(self._data)
 
     def data(self, index, role=None):
-        key = list(self._data.keys())[index.row()]
+        item = self._data[index.row()]
+        # turn display name to model name for objective function and constraints
+        display_name = item if isinstance(item, str) else item.name
+        model_name = display_name.lower().replace(" ", "_")
 
         if role == Qt.DisplayRole:
-            return key
+            return model_name
         elif role == Qt.EditRole:
-            return key
-        #return QVariant()
+            return model_name
 
     def setData(self, index, value, role=None):
-        key = list(self._data.keys())[index.row()]
-        self._data[key] = value
         print("setData")
+        self._data[index.row()] = value
         print(self._data)
-        self.dataChanged.emit()
+        self.dataChanged.emit(index, index)
         return True
 
-    def addData(self, index, value):
-        pass
+    def insertRow(self, row, parent=None, *args, **kwargs):
+        print("insertRow")
+        self._data.insert(row, "")
+        return True
 
     def removeRow(self, row, parent=None, *args, **kwargs):
-        key = list(self._data.keys())[row]
-        del self._data[key]
         print("removeRow")
+        del(self._data[row])
         print(self._data)
-        self.dataChanged.emit()
+        self.dataChanged.emit(self.index(row), self.index(row))
         return True
+
+    def retrieve_data(self):
+        return self._data
 
     def flags(self, index):
         return Qt.ItemIsSelectable | Qt.ItemIsEnabled | Qt.ItemIsAutoTristate

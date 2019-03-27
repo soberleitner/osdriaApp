@@ -14,8 +14,8 @@ class ModelTemplate(object):
         project_name = PropertyLineEdit(
             "Project Name",
             "Name")
-        project_longitude = PropertyValue("Longitude", "0.0", "")
-        project_latitude = PropertyValue("Latitude", "0.0", "")
+        project_longitude = PropertyLineEdit("Longitude", "0.0", "")
+        project_latitude = PropertyLineEdit("Latitude", "0.0", "")
         project_location = PropertyDialog(
             "Project Location",
             List([project_longitude, project_latitude]))
@@ -31,32 +31,16 @@ class ModelTemplate(object):
         timeline_3 = PropertyValueTimeSeries("Timeline 3", timeline_values_3, "kW")
         project_timeline = PropertyPopupMenu("Project Timeline",
                                              List([timeline_1, timeline_2, timeline_3]))
-        property_list = Dict({'name': project_name,
-                              'location': project_location,
-                              'area': project_area,
-                              'timeline': project_timeline})
+        property_list = List([project_name, project_location, project_area, project_timeline])
 
         return property_list
 
     @staticmethod
     def project_elements():
-        sub_com_1 = SubCommodity("General Electricity")
-        sub_com_2 = SubCommodity("Irrigation Water")
-        sub_com_3 = SubCommodity("Domestic Water")
-        commodity_1 = Commodity("Electricity", "", List([sub_com_1]))
-        commodity_2 = Commodity("Water", "", List([sub_com_2, sub_com_3]))
-        core_1 = ProcessCore()
-        core_1.category = ProcessCategory.SUPPLY
-        core_1.section = OverviewSelection.ENERGY
-        core_1.properties = List([])
-        core_2 = ProcessCore()
-        process_1 = Process("Photovoltaic system 1", QPoint(0, 0), core_1)
-        process_2 = Process("Water Pump 1", QPoint(50, 0), core_2)
-        commodity_list = List([commodity_1, commodity_2])
-        process_list = List([process_1, process_2])
-        elements_list = Elements(commodity_list, process_list)
+        commodity_list = []
+        process_list = []
 
-        return elements_list
+        return Elements(commodity_list, process_list)
 
     @staticmethod
     def scenarios():
@@ -73,4 +57,14 @@ class ModelTemplate(object):
 
     @staticmethod
     def process_cores():
+        return List([])
+
+    @staticmethod
+    def time_series():
+        return List([PropertyValueTimeSeries("Electricity Demand", [], "kW"),
+                     PropertyValueTimeSeries("Water Demand", [], "m3/h"),
+                     PropertyValueTimeSeries("Food Demand", [], "t/h")])
+
+    @staticmethod
+    def commodities():
         return List([])

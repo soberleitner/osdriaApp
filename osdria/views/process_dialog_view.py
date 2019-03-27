@@ -29,12 +29,8 @@ class ProcessDialogView(QDialog):
         self._ui.setupUi(self)
 
         """connect widgets to controller"""
-        self._ui.process_name.clicked.connect(self.on_process_click)
+        self._ui.process_name.clicked.connect(self.gather_data)
         self._ui.button_add.clicked.connect(self.on_add_click)
-        self._ui.section_value.clicked.connect(
-            lambda: self._ctrl.open_section_popup(self._ui.section_value, self._section_popup_model))
-        self._ui.category_value.clicked.connect(
-            lambda: self._ctrl.open_category_popup(self._ui.category_value, self._category_popup_model))
         self._ui.button_icon.clicked.connect(self.open_icon_dialog)
         self._ui.variables_list.edit_add.connect(self._ctrl.change_variables)
         self._ui.data_list.edit_add.connect(self._ctrl.change_data)
@@ -54,58 +50,41 @@ class ProcessDialogView(QDialog):
 
         """initialize view"""
         self._new_process = False
-        self._ui.process_name.setReadOnly(False)
-        self._ui.process_name.set_popup(True)
-        self._ui.section_value.setReadOnly(True)
-        self._ui.section_value.set_popup(True)
-        self._ui.category_value.setReadOnly(True)
-        self._ui.category_value.set_popup(True)
         self._ui.objective_value.setAttribute(Qt.WA_MacShowFocusRect, 0)
+        self._ui.process_name.set_model(self._model)
+        self._ui.process_name.setReadOnly(False)
+        self._ui.section_value.set_model(self._section_popup_model)
+        self._ui.category_value.set_model(self._category_popup_model)
         if not self._model.value:
-            print("not model.value")
             self._new_process = True
             self.init_content()
         else:
-            print("existing model.value")
             self.load_content(self._model.value)
 
     def init_content(self):
         """initialise new process with empty inputs"""
-        self._ui.process_name.setText("New Process")
-        self._ui.section_value.setText(OverviewSelection.ENERGY)
-        self._ui.category_value.setText(ProcessCategory.SUPPLY)
+        self._ui.process_name.setText("Process Name")
         icon = QIcon()
         icon.addPixmap(QPixmap(":/icons/img/process_icon@2x.png"), QIcon.Normal, QIcon.Off)
         self._ui.button_icon.setIcon(icon)
-        self._ui.variables_list.setModel(ListModel())
-        # self._ui.data_list.setModel(ListModel())
-        # self._ui.properties_list.setModel(ListModel())
-        # self._ui.inputs_list.setModel(ListModel())
-        # self._ui.outputs_list.setModel(ListModel())
+        self._ui.variables_list.setModel(ListModel([]))
+        self._ui.data_list.setModel(ListModel([]))
+        self._ui.properties_list.setModel(ListModel([]))
+        self._ui.inputs_list.setModel(ListModel([]))
+        self._ui.outputs_list.setModel(ListModel([]))
         self._ui.objective_value.setText("Process Objective Function")
         self._ui.constraints_value.setText("Process Constraints")
         self._new_process = True
-        print("init_content finished")
 
     def load_content(self, process):
-        print("Process name:")
-        print(process.name)
-        self._ui.process_name.setText(str(process.name))
-        self._ui.section_value.setText(str(process.section))
-        self._ui.category_value.setText(str(process.category))
         self._ui.button_icon.setIcon(process.icon)
-        # self._ui.variables_list.setModel(ListModel(process.variables))
-        # self._ui.data_list.setModel(ListModel(process.data))
-        # self._ui.properties_list.setModel(ListModel(process.properties))
-        # self._ui.inputs_list.setModel(ListModel(process.inputs))
-        # self._ui.outputs_list.setModel(ListModel(process.outputs))
+        self._ui.variables_list.setModel(ListModel(process.variables.list))
+        self._ui.data_list.setModel(ListModel(process.data.list))
+        self._ui.properties_list.setModel(ListModel(process.properties))
+        self._ui.inputs_list.setModel(ListModel(process.inputs))
+        self._ui.outputs_list.setModel(ListModel(process.outputs))
         self._ui.objective_value.setText(str(process.objective_function))
         self._ui.constraints_value.setText(str(process.constraints))
-
-    def on_process_click(self):
-        """transfer all data of current process to general model"""
-        self.gather_data()
-        self._ctrl.open_process_popup(self._ui.process_name)
 
     def on_process_change(self):
         self._ui.process_name.setText(str(self._model.value))
@@ -135,6 +114,11 @@ class ProcessDialogView(QDialog):
             self._ui.section_value.text(),
             self._ui.category_value.text(),
             self._ui.button_icon.icon(),
+            self._ui.variables_list.model().retrieve_data(),
+            self._ui.data_list.model().retrieve_data(),
+            self._ui.properties_list.model().retrieve_data(),
+            self._ui.inputs_list.model().retrieve_data(),
+            self._ui.outputs_list.model().retrieve_data(),
             self._ui.objective_value.text(),
             self._ui.constraints_value.toPlainText()
         )

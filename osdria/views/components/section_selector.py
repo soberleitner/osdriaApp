@@ -1,5 +1,5 @@
 from enum import Enum
-from PySide2.QtCore import Signal
+from PySide2.QtCore import Signal, QRect
 from PySide2.QtGui import QPixmap
 from PySide2.QtWidgets import QLabel
 from models.model import OverviewSelection
@@ -22,6 +22,8 @@ class SectionSelector(QLabel):
             QPixmap(":/icons/img/logo_light_food@2x.png"),
             QPixmap(":/icons/img/logo_light_business@2x.png")
         ]
+        self._section = OverviewSelection.OVERVIEW
+        self.updateGeometry()
 
     def change_icon(self, selection):
         self.setPixmap(self.image[selection.value])
@@ -43,21 +45,26 @@ class SectionSelector(QLabel):
 
         # perform hovering effect for the corresponding section
         if energy_x & energy_y:
-            section = OverviewSelection.ENERGY
+            self._section = OverviewSelection.ENERGY
         elif water_x & water_y:
-            section = OverviewSelection.WATER
+            self._section = OverviewSelection.WATER
         elif food_x & food_y:
-            section = OverviewSelection.FOOD
+            self._section = OverviewSelection.FOOD
         elif business_x & business_y:
-            section = OverviewSelection.BUSINESS
+            self._section = OverviewSelection.BUSINESS
         else:
-            section = OverviewSelection.OVERVIEW
+            self._section = OverviewSelection.OVERVIEW
 
         # emit hovered signal to change title
-        self.hovered.emit(section.value)
+        self.hovered.emit(self._section.value)
 
     def mousePressEvent(self, event):
-        self.clicked.emit()
+        # only emit clicked signal on actual sections
+        if self._section != OverviewSelection.OVERVIEW:
+            self.clicked.emit()
+
+    def showEvent(self, event):
+        self.change_icon(OverviewSelection.OVERVIEW)
 
     def resizeEvent(self, event):
         """keep aspect ratio of logo"""
@@ -66,4 +73,4 @@ class SectionSelector(QLabel):
         pos_x = (self.parent().width() - width) / 2
         pos_y = (self.parent().height() - height) / 2
         min_size = min(width, height)
-        self.setGeometry(pos_x, pos_y, min_size, min_size)
+        self.setGeometry(QRect(pos_x, pos_y, min_size, min_size))

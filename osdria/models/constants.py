@@ -75,3 +75,9 @@ class PropType(Enum):
     LINE_EDIT = 0
     DIALOG = 1
     POPUP_MENU = 2
+
+
+class MimeType(Enum):
+    """define MimeTypes
+    PROCESS_CORE"""
+    PROCESS_CORE = "application/x-process_core"
