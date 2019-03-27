@@ -1,5 +1,5 @@
-from PySide2.QtCore import QSize, QLineF, QRect, Qt, QMargins
-from PySide2.QtGui import QPen, QBrush, QColor, QTransform
+from PySide2.QtCore import QSize, QPoint, QLineF, QRect, Qt, QMargins
+from PySide2.QtGui import QPen, QBrush, QColor, QTransform, QCursor
 from PySide2.QtWidgets import QGraphicsScene, QGraphicsItemGroup, QGraphicsItem, QMenu, QAction
 
 from models.constants import MimeType, SelectConnect
@@ -23,6 +23,7 @@ class SectionScene(QGraphicsScene):
         self._bounding_rect = BoundingRect(model.process_list, model.commodity_list)
         self._clicked_item = None
         self._item_mouse_offset = None
+        self._connect_line = None
         self._items_border = QRect()
         self._grid_border = QRect()
         self._section = section
@@ -142,6 +143,46 @@ class SectionScene(QGraphicsScene):
 
         return QRect(left, top, right-left, bottom-top).marginsAdded(QMargins(margin, margin, margin, margin))
 
+    def show_connection_menu(self, item, position):
+        menu = QMenu()
+        # add all output commodities of process to menu, including All
+        if not self._connect_line:
+            commodities = item.data(0).core.outputs
+        else:
+            selection = self._connect_line.data(1)
+            commodities = list(filter(lambda com: com.commodity_type == selection.commodity_type,
+                                      item.data(0).core.inputs))
+
+            if not commodities:
+                self.views()[1].setMouseTracking(False)
+                self.removeItem(self._connect_line)
+                self._connect_line = None
+                return
+
+        for commodity in commodities:
+            action = menu.addAction(str(commodity))
+            action.setData(commodity)
+
+        # execute menu
+        action = menu.exec_(QCursor.pos())
+        if action:
+            if not self._connect_line:
+                # start connection
+                line_pen = QPen(Qt.lightGray, 1, Qt.DashLine)
+                line = QLineF(position, position)
+                self._connect_line = self.addLine(line, line_pen)
+                self._connect_line.setData(0, item)
+                self._connect_line.setData(1, action.data())
+                self.views()[1].setMouseTracking(True)
+            else:
+                # end connection
+                self.views()[1].setMouseTracking(False)
+                self.removeItem(self._connect_line)
+                self._connect_line = None
+
+    def connect_processes(self, start_process, end_process):
+        pass
+
     def drawBackground(self, painter, rect):
         if self.draft_mode:
             border_rect = self.get_grid_border()
@@ -189,16 +230,28 @@ class SectionScene(QGraphicsScene):
                 self._clicked_item = None
 
     def mouseMoveEvent(self, event):
-        if self.draft_mode & (self.edit_mode == SelectConnect.SELECT):
-            if self._clicked_item:
-                # move drop indicator along grid and process item according to mouse position
-                self.align_drop_indicator(event.scenePos() - self._item_mouse_offset)
-                self._clicked_item.setPos(event.scenePos() - self._item_mouse_offset)
+        if self.draft_mode:
+            if self.edit_mode == SelectConnect.SELECT:
+                if self._clicked_item:
+                    # move drop indicator along grid and process item according to mouse position
+                    self.align_drop_indicator(event.scenePos() - self._item_mouse_offset)
+                    self._clicked_item.setPos(event.scenePos() - self._item_mouse_offset)
+            elif self._connect_line:
+                # update connect line in CONNECT mode
+                line = self._connect_line.line()
+                # add offset to position to avoid itemAt function to return lineItem
+                line.setP2(event.scenePos() - QPoint(2, 2))
+                self._connect_line.setLine(line)
 
         super().mouseMoveEvent(event)
 
     def mouseReleaseEvent(self, event):
-        if self.draft_mode & (self.edit_mode == SelectConnect.SELECT):
+        # prevent action in normal mode
+        if not self.draft_mode:
+            return
+
+        if self.edit_mode == SelectConnect.SELECT:
+            # release process item
             if self._clicked_item:
                 self._clicked_item.setOpacity(1.0)
                 # remove clicked item from collision list with drop indicator
@@ -212,6 +265,18 @@ class SectionScene(QGraphicsScene):
                     self._bounding_rect.update()
                 self.disable_drop_indicator()
                 self._clicked_item = None
+        else:
+            # connecting processes
+            if event.button() == Qt.LeftButton:
+                clicked_item = self.itemAt(event.scenePos(), QTransform())
+                if self._clicked_item:
+                    if isinstance(clicked_item, ProcessItem):
+                        self.show_connection_menu(clicked_item, event.scenePos())
+                        return
+
+                self.views()[1].setMouseTracking(False)
+                self.removeItem(self._connect_line)
+                self._connect_line = None
 
         super().mouseReleaseEvent(event)
 
@@ -250,10 +315,8 @@ class SectionScene(QGraphicsScene):
 
         # create process item and connections
         self.draw_process(process)
-        # todo draw connections
 
         self._bounding_rect.update()
-
         self.disable_drop_indicator()
 
     def contextMenuEvent(self, event):
@@ -262,19 +325,23 @@ class SectionScene(QGraphicsScene):
         if not self.draft_mode:
             return
 
-        # open context menu only for process items
-        self._clicked_item = self.itemAt(event.scenePos(), QTransform())
-        if self._clicked_item:
-            if isinstance(self._clicked_item, ProcessItem):
-                menu = QMenu()
-                delete_action = QAction("Delete", None)
-                delete_action.triggered.connect(
-                    lambda: self.delete_process(self._clicked_item))
-                menu.addAction(delete_action)
-                menu.exec_(event.screenPos())
-                self._clicked_item = None
+        if self._edit_mode == SelectConnect.SELECT:
+            # open context menu only for process items
+            self._clicked_item = self.itemAt(event.scenePos(), QTransform())
+            if self._clicked_item:
+                if isinstance(self._clicked_item, ProcessItem):
+                    menu = QMenu()
+                    delete_action = QAction("Delete", None)
+                    delete_action.triggered.connect(
+                        lambda: self.delete_process(self._clicked_item))
+                    menu.addAction(delete_action)
+                    menu.exec_(event.screenPos())
+                    self._clicked_item = None
+        else:
+            # open context menu for commodities of other sections
+            # todo add commodity context menu
+            pass
 
-    # todo extend/reduce sceneRect with position of elements
     def setSceneRect(self, rect):
         """set sceneRect to view boundaries if necessary space is less"""
         super().setSceneRect(self._bounding_rect.scene_rect(rect, 2*MIN_GRID_MARGIN))
@@ -288,7 +355,7 @@ class BoundingRect(QRect):
         self._commodities = commodity_list
 
     def update(self):
-        # todo add additional space for future expansion
+        # todo extend/reduce sceneRect with position of elements
         # set rect to initial value if no items exist
         if not self._processes:
             if not self._commodities:
