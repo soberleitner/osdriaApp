@@ -151,8 +151,8 @@ class Process(QObject):
         super(Process, self).__init__()
         self._coordinate = coordinate
         self.core = process_core
-        self.inputs = List()
-        self.outputs = List()
+        self.inputs = List([])
+        self.outputs = List([])
 
         property_name = self.core.category.name.title() + " Name"
         name_property = PropertyLineEdit(property_name, name)
@@ -217,7 +217,8 @@ class CommodityType(QObject):
     def __init__(self, name=""):
         super(CommodityType, self).__init__()
         self._name = name
-        self._coordinate = QPoint(0, 0)
+        # represents x value in respective section
+        self.locations = Dict({})
         self._properties = List([])
         self._properties.add(
             PropertyLineEdit(COMMODITY_NAME, name))
@@ -225,13 +226,13 @@ class CommodityType(QObject):
     def write(self, output):
         """write data to output stream"""
         output.writeString(self._name)
-        output << self._coordinate
+        self.locations.write(output)
         self._properties.write(output)
 
     def read(self, input_):
         """read data from input stream"""
         self._name = input_.readString()
-        input_ >> self._coordinate
+        self.locations.read(input_)
         self._properties.read(input_)
 
     def __str__(self):
@@ -247,23 +248,35 @@ class Commodity(QObject):
     name_changed = Signal()
     type_changed = Signal()
 
-    def __init__(self, name="", commodity_type=CommodityType()):
+    def __init__(self, name="", commodity_type=CommodityType(), section=OverviewSelection.OVERVIEW):
         super(Commodity, self).__init__()
         self._name = name
         self._type = commodity_type
+        self._section = section
+        self._id = id(self)
 
     def write(self, output):
         """write data to output stream"""
         output.writeString(self._name)
-        self._type.write(output)
+        output.writeString(str(self._type))
+        output.writeUInt32(self._section.value)
+        output.writeUInt64(self._id)
 
     def read(self, input_):
         """read data from input stream"""
         self._name = input_.readString()
-        self._type.read(input_)
+        self._type = input_.readString()
+        self._section = OverviewSelection(input_.readUInt32())
+        self._id = input_.readUInt64()
 
     def __str__(self):
         return self._name
+
+    def __eq__(self, other):
+        return (self.commodity_type == other.commodity_type) & (self.name == other.name)
+
+    def copy(self):
+        return Commodity(self.name, self.commodity_type)
 
     @property
     def name(self):
@@ -282,3 +295,15 @@ class Commodity(QObject):
     def commodity_type(self, value):
         self._type = value
         self.type_changed.emit()
+
+    @property
+    def section(self):
+        return self._section
+
+    @section.setter
+    def section(self, value):
+        self._section = value
+
+    @property
+    def unique_id(self):
+        return self._id

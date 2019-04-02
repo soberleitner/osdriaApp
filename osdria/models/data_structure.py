@@ -87,6 +87,9 @@ class List(QObject):
         self._list.remove(item)
         self.list_reduced.emit(item)
 
+    def index(self, element):
+        return self._list.index(element)
+
     @property
     def list(self):
         return self._list
@@ -108,11 +111,18 @@ class Dict(QObject):
         self._dict = dict_input
 
     def write(self, output):
+        from models.constants import OverviewSelection
         """write list data to output stream"""
         output.writeUInt32(len(self._dict))
         for name, list_element in self._dict.items():
+            name_type = type(name)
             element_type = type(list_element)
-            output.writeString(name)
+            output.writeString(name.__class__.__module__)
+            output.writeString(name.__class__.__name__)
+            if name_type is str:
+                output.writeString(name)
+            elif name_type is OverviewSelection:
+                output.writeUInt32(name.value)
             output.writeString(list_element.__class__.__module__)
             output.writeString(list_element.__class__.__name__)
             if element_type is str:
@@ -125,12 +135,25 @@ class Dict(QObject):
                 list_element.write(output)
 
     def read(self, input_):
+        from models.constants import OverviewSelection
         """read list data from input stream"""
         dict_lengths = input_.readUInt32()
         self._dict = {}
         for index in range(dict_lengths):
             # identify class of list element
-            name = input_.readString()
+            module_name = input_.readString()
+            class_name = input_.readString()
+            submodules = module_name.split(".")
+            if len(submodules) >= 2:
+                module = __import__(module_name, fromlist=[submodules[1]])
+            else:
+                module = __import__(module_name)
+            name_class = getattr(module, class_name)
+            if name_class == str:
+                name = input_.readString()
+            elif name_class == OverviewSelection:
+                name = OverviewSelection(input_.readUInt32())
+
             module_name = input_.readString()
             class_name = input_.readString()
             submodules = module_name.split(".")
@@ -165,6 +188,12 @@ class Dict(QObject):
 
     def __len__(self):
         return len(self._dict)
+
+    def __setitem__(self, key, value):
+        self._dict[key] = value
+
+    def __getitem__(self, item):
+        return self._dict[item]
 
     def add(self, name, value):
         self._dict[name] = value

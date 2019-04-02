@@ -17,11 +17,50 @@ class ProjectCtrl(QObject):
         self._model = model
         self.connect_model_data(self._model)
 
-    def connect_model_data(self, model):
+    @staticmethod
+    def connect_model_data(model):
         """connect model data with references to other model data when model is loaded from file"""
         # connect process core in Process instance to ProcessCore instance
-        for process in model.project_elements.process_list:
+        for process_core in model.process_cores:
+            # get commodity type from commodity list
+            for input_data in process_core.inputs:
+                input_data.commodity_type = list(filter(lambda commodity:
+                                                        str(commodity) == str(input_data.commodity_type),
+                                                        model.commodities))[0]
+
+            for output in process_core.outputs:
+                output.commodity_type = list(filter(lambda commodity:
+                                                    str(commodity) == str(output.commodity_type),
+                                                    model.commodities))[0]
+
+        commodity_list = model.project_elements.commodity_list
+        for index, commodity in enumerate(commodity_list):
+            commodity_list[index] = list(filter(lambda commodity_origin: str(commodity_origin) == str(commodity),
+                                                model.commodities))[0]
+
+        connection_list = {}
+        for index, process in enumerate(model.project_elements.process_list):
             process.core = list(filter(lambda core: core.name == process.core, model.process_cores))[0]
+
+            for index, _ in enumerate(process.inputs):
+                if process.inputs[index].unique_id in connection_list.keys():
+                    process.inputs[index] = connection_list[process.inputs[index].unique_id]
+                else:
+                    process.inputs[index].commodity_type = list(filter(
+                        lambda commodity: str(commodity) == str(input_data.commodity_type),
+                        model.commodities))[0]
+                    connection_list[process.inputs[index].unique_id] = process.inputs[index]
+
+            for index, _ in enumerate(process.outputs):
+                if process.outputs[index].unique_id in connection_list.keys():
+                    # if output commodity exists set the correct one
+                    process.outputs[index] = connection_list[process.outputs[index].unique_id]
+                else:
+                    # set output commodity of this process as standard and assign commodity type from list
+                    process.outputs[index].commodity_type = list(filter(
+                        lambda commodity: str(commodity) == str(input_data.commodity_type),
+                        model.commodities))[0]
+                    connection_list[process.outputs[index].unique_id] = process.outputs[index]
 
         # todo add necessary model connectors
 
