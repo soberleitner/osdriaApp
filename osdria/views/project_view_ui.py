@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'project_view.ui',
 # licensing of 'project_view.ui' applies.
 #
-# Created: Tue Mar 26 10:07:38 2019
+# Created: Tue Apr  9 08:42:10 2019
 #      by: pyside2-uic  running on PySide2 5.12.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -595,10 +595,13 @@ class Ui_MainWindow(object):
         self.action_scenarios.setObjectName("action_scenarios")
         self.action_execute = QtWidgets.QAction(MainWindow)
         self.action_execute.setObjectName("action_execute")
+        self.action_timeseries = QtWidgets.QAction(MainWindow)
+        self.action_timeseries.setObjectName("action_timeseries")
         self.menu_file.addAction(self.action_save)
         self.menu_file.addAction(self.action_close)
         self.menu_model.addAction(self.action_processes)
         self.menu_model.addAction(self.action_commodities)
+        self.menu_model.addAction(self.action_timeseries)
         self.menu_run.addAction(self.action_scenarios)
         self.menu_run.addAction(self.action_execute)
         self.menubar.addAction(self.menu_file.menuAction())
@@ -646,11 +649,13 @@ class Ui_MainWindow(object):
         self.action_scenarios.setShortcut(QtWidgets.QApplication.translate("MainWindow", "Ctrl+Shift+S", None, -1))
         self.action_execute.setText(QtWidgets.QApplication.translate("MainWindow", "Execute", None, -1))
         self.action_execute.setShortcut(QtWidgets.QApplication.translate("MainWindow", "Ctrl+R", None, -1))
+        self.action_timeseries.setText(QtWidgets.QApplication.translate("MainWindow", "Timeseries", None, -1))
+        self.action_timeseries.setShortcut(QtWidgets.QApplication.translate("MainWindow", "Ctrl+Shift+T", None, -1))
 
 from views.components.tool_button import ToolButton
-from views.components.section_selector import SectionSelector
 from views.components.scene_view import SceneView
-from views.components.property_edit import PropertyEdit
 from views.components.sidebar import Sidebar
+from views.components.section_selector import SectionSelector
+from views.components.property_edit import PropertyEdit
 import osdria_app_rc
 import osdria_app_rc

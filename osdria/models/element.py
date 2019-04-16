@@ -1,7 +1,7 @@
 from PySide2.QtCore import QObject, Signal
-from PySide2.QtGui import QVector2D, QVector4D, QIcon
+from PySide2.QtGui import QIcon
 
-from models.constants import ProcessCategory, OverviewSelection
+from models.constants import ProcessCategory, OverviewSelection, DatasetResolution
 from models.property import *
 from models.data_structure import *
 
@@ -153,6 +153,7 @@ class Process(QObject):
         self.core = process_core
         self.inputs = List([])
         self.outputs = List([])
+        self.optimization_output = Dict({})
 
         property_name = self.core.category.name.title() + " Name"
         name_property = PropertyLineEdit(property_name, name)
@@ -167,6 +168,7 @@ class Process(QObject):
         self.inputs.write(output)
         self.outputs.write(output)
         self.properties.write(output)
+        self.optimization_output.write(output)
 
     def read(self, input_):
         """read data from input stream"""
@@ -177,6 +179,7 @@ class Process(QObject):
         self.inputs.read(input_)
         self.outputs.read(input_)
         self.properties.read(input_)
+        self.optimization_output.read(input_)
 
     def __str__(self):
         return self.name
@@ -185,12 +188,6 @@ class Process(QObject):
         """initialise properties of ProcessCore as templates"""
         for prop in self.core.properties:
             self.properties.add(prop.copy())
-
-    def convert(self):
-        """convert objective function and constraints into executable
-        optimization code with property values and input/outputs connections
-        Additionally, error checking for missing inputs & outputs"""
-        pass
 
     @property
     def name(self):
@@ -219,21 +216,21 @@ class CommodityType(QObject):
         self._name = name
         # represents x value in respective section
         self.locations = Dict({})
-        self._properties = List([])
-        self._properties.add(
+        self.properties = List([])
+        self.properties.add(
             PropertyLineEdit(COMMODITY_NAME, name))
 
     def write(self, output):
         """write data to output stream"""
         output.writeString(self._name)
         self.locations.write(output)
-        self._properties.write(output)
+        self.properties.write(output)
 
     def read(self, input_):
         """read data from input stream"""
         self._name = input_.readString()
         self.locations.read(input_)
-        self._properties.read(input_)
+        self.properties.read(input_)
 
     def __str__(self):
         return self._name
@@ -248,26 +245,32 @@ class Commodity(QObject):
     name_changed = Signal()
     type_changed = Signal()
 
-    def __init__(self, name="", commodity_type=CommodityType(), section=OverviewSelection.OVERVIEW):
+    def __init__(self, name="", commodity_type=CommodityType(), resolution=DatasetResolution.YEARLY):
         super(Commodity, self).__init__()
         self._name = name
         self._type = commodity_type
-        self._section = section
         self._id = id(self)
+        self._resolution = resolution
+        self.optimization_output = Dict({'input_processes': Dict({}), 'output_processes': Dict({})})
+        self.connection_count = Dict({})
 
     def write(self, output):
         """write data to output stream"""
         output.writeString(self._name)
         output.writeString(str(self._type))
-        output.writeUInt32(self._section.value)
         output.writeUInt64(self._id)
+        self.optimization_output.write(output)
+        self.connection_count.write(output)
+        output.writeUInt32(self._resolution.value)
 
     def read(self, input_):
         """read data from input stream"""
         self._name = input_.readString()
         self._type = input_.readString()
-        self._section = OverviewSelection(input_.readUInt32())
         self._id = input_.readUInt64()
+        self.optimization_output.read(input_)
+        self.connection_count.read(input_)
+        self._resolution = DatasetResolution(input_.readUInt32())
 
     def __str__(self):
         return self._name
@@ -276,7 +279,7 @@ class Commodity(QObject):
         return (self.commodity_type == other.commodity_type) & (self.name == other.name)
 
     def copy(self):
-        return Commodity(self.name, self.commodity_type)
+        return Commodity(self.name, self.commodity_type, self.resolution)
 
     @property
     def name(self):
@@ -307,3 +310,7 @@ class Commodity(QObject):
     @property
     def unique_id(self):
         return self._id
+
+    @property
+    def resolution(self):
+        return self._resolution

@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'process_dialog_view.ui',
 # licensing of 'process_dialog_view.ui' applies.
 #
-# Created: Sun Feb 24 10:48:21 2019
+# Created: Sat Apr 13 16:23:30 2019
 #      by: pyside2-uic  running on PySide2 5.12.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -240,7 +240,6 @@ class Ui_ProcessDialog(object):
         font.setFamily("Arial")
         font.setPointSize(12)
         self.objective_value.setFont(font)
-        self.objective_value.setFrame(False)
         self.objective_value.setObjectName("objective_value")
         self.objective_vertical.addWidget(self.objective_value)
         self.verticalLayout_3.addLayout(self.objective_vertical)

@@ -44,7 +44,8 @@ PropertyView > QLabel, PropertyDialogView QLabel {
     color: #4f4f4f;
 }
 
-PropertyView > QLineEdit, PropertyDialogView PropertyEdit, ListDialogView PropertyEdit, ProcessDialogView PropertyEdit {
+PropertyView > QLineEdit, PropertyDialogView PropertyEdit, ListDialogView PropertyEdit, ProcessDialogView PropertyEdit,
+DatasetDialogView PropertyEdit {
     font-size: 22px;
     color: #fff;
 }

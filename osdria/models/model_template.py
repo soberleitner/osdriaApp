@@ -23,15 +23,7 @@ class ModelTemplate(object):
             "Project Area",
             "0.0",
             "ha")
-        timeline_values_1 = List(["3", "5", "10"])
-        timeline_values_2 = List(["30", "50", "100"])
-        timeline_values_3 = List(["300", "500", "1000"])
-        timeline_1 = PropertyValueTimeSeries("Timeline 1", timeline_values_1, "kW")
-        timeline_2 = PropertyValueTimeSeries("Timeline 2", timeline_values_2, "kW")
-        timeline_3 = PropertyValueTimeSeries("Timeline 3", timeline_values_3, "kW")
-        project_timeline = PropertyPopupMenu("Project Timeline",
-                                             List([timeline_1, timeline_2, timeline_3]))
-        property_list = List([project_name, project_location, project_area, project_timeline])
+        property_list = List([project_name, project_location, project_area])
 
         return property_list
 
@@ -61,9 +53,7 @@ class ModelTemplate(object):
 
     @staticmethod
     def time_series():
-        return List([PropertyValueTimeSeries("Electricity Demand", [], "kW"),
-                     PropertyValueTimeSeries("Water Demand", [], "m3/h"),
-                     PropertyValueTimeSeries("Food Demand", [], "t/h")])
+        return List([])
 
     @staticmethod
     def commodities():

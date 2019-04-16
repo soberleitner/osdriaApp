@@ -1,9 +1,13 @@
-from PySide2.QtCore import QRect, Qt
+from PySide2.QtCore import QRect, Signal
 from PySide2.QtWidgets import QGraphicsView, QAbstractScrollArea
+
+from models.data_structure import List
 
 
 class SceneView(QGraphicsView):
     """set scene rectangle at resize event of view"""
+    sidebar_toggled = Signal(List)
+
     def __init__(self, parent):
         super().__init__(parent)
         self.draft_mode = False

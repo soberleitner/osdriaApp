@@ -21,9 +21,9 @@ class App(QApplication):
         self.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
 
         # load stylesheet
-        style_file = QFile('resources/style.css')
-        style_file.open(QFile.ReadOnly)
-        self.setStyleSheet(str(style_file.readAll()))
+        with open('resources/style.css') as style_file:
+            self.setStyleSheet(style_file.read())
+            style_file.close()
 
         # display welcome dialog
         self.welcome_controller = WelcomeCtrl()

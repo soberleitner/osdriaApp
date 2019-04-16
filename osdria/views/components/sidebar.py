@@ -25,9 +25,8 @@ class Sidebar(QListWidget):
     def load_data(self, property_list, page_type=PageType.OVERVIEW):
         """retrieve data to display properties"""
         self.clear()
-        is_draftbar = page_type == PageType.DRAFT
         for index, prop in enumerate(property_list):
-            if is_draftbar:
+            if page_type == PageType.DRAFT:
                 draft_property_ctrl = DraftbarElementCtrl(prop)
                 item = DraftbarElementView(self, ProcessCategory(index), prop, draft_property_ctrl)
             else:

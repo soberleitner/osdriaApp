@@ -75,7 +75,7 @@ class Model(QObject):
         data_output = QDataStream(self._project_file)
 
         # set checkable data
-        data_output.setVersion(QDataStream.Qt_5_6)
+        data_output.setVersion(QDataStream.Qt_5_12)
         data_output.writeUInt32(FILE_TYPE)
 
         # write model data to file
@@ -96,7 +96,7 @@ class Model(QObject):
         # check for correct file
         version = data_input.version()
         file_type = data_input.readUInt32()
-        if data_input.version() != QDataStream.Qt_5_6:
+        if data_input.version() != QDataStream.Qt_5_12:
             raise RuntimeError
         if file_type != FILE_TYPE:
             raise RuntimeError

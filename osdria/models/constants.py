@@ -81,3 +81,42 @@ class MimeType(Enum):
     """define MimeTypes
     PROCESS_CORE"""
     PROCESS_CORE = "application/x-process_core"
+
+
+class DatasetResolution(Enum):
+    """define different resolutions for datasets
+    numbers represent the respective amount within a year
+    HOURLY
+    DAILY
+    WEEKLY
+    MONTHLY"""
+    HOURLY = 8760
+    DAILY = 365
+    WEEKLY = 52
+    MONTHLY = 12
+    YEARLY = 1
+
+    def __str__(self):
+        """return name as lowercase with first letter uppercase"""
+        return self.name.title()
+
+class PyomoVarType(Enum):
+    """define different type of pyomo variables
+    all in pyomo book at page 51
+    REALS
+    POSITIVE_REALS
+    NON_NEGATIVE_REALS
+    INTEGERS
+    POSTIVIE_INTEGERS
+    NON_NEGATIVE_INTEGERS
+    BOOLEAN"""
+    REALS = "Reals"
+    POSITIVE_REALS = "PositiveReals"
+    NON_NEGATIVE_REALS = "NonNegativeReals"
+    INTEGERS = "Integers"
+    POSITIVE_INTEGERS = "PositiveIntegers"
+    NON_NEGATIVE_INTEGERS = "NonPositiveIntegers"
+    BOOLEAN = "Boolean"
+
+    def __str__(self):
+        return self.value

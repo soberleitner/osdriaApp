@@ -1,6 +1,5 @@
 from PySide2.QtWidgets import *
 from PySide2.QtCore import Signal, QObject, QAbstractListModel, Qt, QModelIndex
-from models.data_structure import Dict
 
 
 class ProcessListView(QListView):
@@ -53,21 +52,16 @@ class ListModel(QAbstractListModel):
             return model_name
 
     def setData(self, index, value, role=None):
-        print("setData")
         self._data[index.row()] = value
-        print(self._data)
         self.dataChanged.emit(index, index)
         return True
 
     def insertRow(self, row, parent=None, *args, **kwargs):
-        print("insertRow")
         self._data.insert(row, "")
         return True
 
     def removeRow(self, row, parent=None, *args, **kwargs):
-        print("removeRow")
-        del(self._data[row])
-        print(self._data)
+        self._data.remove(self._data[row])
         self.dataChanged.emit(self.index(row), self.index(row))
         return True
 

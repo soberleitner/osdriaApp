@@ -1765,6 +1765,7 @@
     </property>
     <addaction name="action_processes"/>
     <addaction name="action_commodities"/>
+    <addaction name="action_timeseries"/>
    </widget>
    <widget class="QMenu" name="menu_run">
     <property name="title">
@@ -1824,6 +1825,14 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+R</string>
+   </property>
+  </action>
+  <action name="action_timeseries">
+   <property name="text">
+    <string>Timeseries</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+T</string>
    </property>
   </action>
  </widget>

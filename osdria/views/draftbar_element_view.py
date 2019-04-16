@@ -1,6 +1,6 @@
 from math import ceil
 
-from PySide2.QtCore import QRect, QSize, Qt, QAbstractTableModel, QMimeData
+from PySide2.QtCore import QRect, QSize, Qt, QAbstractTableModel, QMimeData, QByteArray
 from PySide2.QtGui import QPainter, QStandardItemModel, QStandardItem, QPen
 from PySide2.QtWidgets import *
 
@@ -81,6 +81,7 @@ class ElementListModel(QAbstractTableModel):
         mime_data = QMimeData()
         element_index = indexes[0].row() * ELEMENT_COLUMN_NUMBER + indexes[0].column()
         # send name of process core to QGraphicsScene
-        mime_data.setData(MimeType.PROCESS_CORE.value, self._model[element_index].name)
+        data_array = QByteArray(bytes(self._model[element_index].name, 'UTF-8'))
+        mime_data.setData(MimeType.PROCESS_CORE.value, data_array)
 
         return mime_data

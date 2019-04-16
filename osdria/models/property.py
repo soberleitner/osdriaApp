@@ -1,7 +1,7 @@
 from PySide2.QtCore import *
 
 from models.data_structure import List
-from models.constants import PropType
+from models.constants import PropType, PyomoVarType, DatasetResolution
 
 
 class PropertyValue(QObject):
@@ -68,6 +68,44 @@ class PropertyValue(QObject):
     def unit(self, value):
         self._unit = value
 
+class PropertyVariable(QObject):
+    """data stored for property variable
+        @param: name(str)
+        @param: resolution(DatasetResolution)
+        @param: pyomo_type(PyomoVarType)"""
+
+    def __init__(self, name="", resolution=DatasetResolution.YEARLY, pyomo_type=PyomoVarType.REALS):
+        super().__init__()
+        self._name = name
+        self._resolution = resolution
+        self._type = pyomo_type
+
+    def __str__(self):
+        return self._name
+
+    def write(self, output):
+        """write data to output stream"""
+        output.writeString(self._name)
+        output.writeUInt32(self._resolution.value)
+        output.writeString(self._type.value)
+
+    def read(self, input_):
+        """read data from input stream"""
+        self._name = input_.readString()
+        self._resolution = DatasetResolution(input_.readUInt32())
+        self._type = PyomoVarType(input_.readString())
+
+    @property
+    def name(self):
+        return self._name
+
+    @property
+    def resolution(self):
+        return self._resolution
+
+    @property
+    def pyomo_type(self):
+        return self._type
 
 class PropertyValueTimeSeries(PropertyValue):
     """data stored for property value representing a times series
@@ -120,6 +158,9 @@ class PropertyLineEdit(PropertyValue):
 
     def __init__(self, name="", value="", unit=""):
         super().__init__(name, value, unit)
+
+    def copy(self):
+        return PropertyLineEdit(self.name, self.value, self.unit)
 
 
 class PropertyDialog(PropertyValue):
@@ -198,12 +239,15 @@ class PropertyPopupMenu(PropertyValue):
         super().read(input_)
         self._choices.read(input_)
         # get object from choices list based on saved name in value
-        value = list(filter(lambda x: str(x) == super(PropertyPopupMenu, self).value, self._choices))[0]
+        if self._choices:
+            value = list(filter(lambda x: str(x) == super(PropertyPopupMenu, self).value, self._choices))[0]
+        else:
+            value = ""
         PropertyValue.value.fset(self, value)
 
     def copy(self):
         """return new PropertyPopupMenu based on original data"""
-        return PropertyPopupMenu(super().name, self.choices)
+        return PropertyPopupMenu(self.name, self.choices)
 
     @property
     def choices(self):

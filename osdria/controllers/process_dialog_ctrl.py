@@ -5,29 +5,35 @@ from controllers.property_popup_ctrl import PropertyPopupCtrl
 from controllers.property_dialog_ctrl import PropertyDialogCtrl
 from views.property_popup_view import PropertyPopupView
 from views.property_dialog_view import PropertyDialogView
-from models.constants import ProcessCategory, OverviewSelection
+from models.constants import ProcessCategory, OverviewSelection, DatasetResolution, PyomoVarType
 from models.data_structure import List
-from models.property import PropertyDialog, PropertyPopupMenu, PropertyLineEdit, PropertyValueTimeSeries, PropertyValue
+from models.property import *
 from models.element import ProcessCore, Commodity
 
 
 class ProcessDialogCtrl(QObject):
     """controller for property dialog view"""
-    def __init__(self, model, commodity_list):
+    def __init__(self, model, commodity_list, time_series_list):
         super(ProcessDialogCtrl, self).__init__()
         self._model = model
         self._commodities = commodity_list
+        self._time_series = time_series_list
 
     def change_variables(self, command, _, model):
         # Ignore edit command in variables (alternative workflow: delete & add)
         if command == "Edit":
             return
 
-        dialog_model = PropertyDialog("Add Variable", [PropertyLineEdit("Name")])
+        dialog_model = PropertyDialog("Add Variable", [PropertyLineEdit("Name"),
+                                                       PropertyPopupMenu("Resolution", List(list(DatasetResolution))),
+                                                       PropertyPopupMenu("Pyomo Type", List(list(PyomoVarType)))])
         self.show_dialog(dialog_model)
 
         name = dialog_model.values[0].value
-        self.add_item(model, name)
+        resolution = dialog_model.values[1].value
+        pyomo_type = dialog_model.values[2].value
+        item = PropertyVariable(name, resolution, pyomo_type)
+        self.add_item(model, item)
 
     def change_data(self, command, index, model):
         if command == "Add":
@@ -71,18 +77,21 @@ class ProcessDialogCtrl(QObject):
             name = dialog_model.values[0].value
             unit = dialog_model.values[1].value
             prop_type = dialog_model.values[2].value
-            item = PropertyValueTimeSeries(name, [], unit) if prop_type == time_series \
-                else PropertyValue(name, "", unit)
+            item = PropertyPopupMenu(name, self._time_series) if prop_type == time_series \
+                else PropertyLineEdit(name, "", unit)
             self.add_item(model, item)
 
     def change_commodities(self, command, index, model):
         if command == "Add":
             dialog_model = PropertyDialog(command + " Commodity",
-                                          [PropertyLineEdit("Name"), PropertyPopupMenu("Type", self._commodities)])
+                                          [PropertyLineEdit("Name"),
+                                           PropertyPopupMenu("Type", self._commodities),
+                                           PropertyPopupMenu("Resolution", List(list(DatasetResolution)))])
             if self.show_dialog(dialog_model):
                 name = dialog_model.values[0].value
                 commodity_type = dialog_model.values[1].value
-                item = Commodity(name, commodity_type)
+                resolution = dialog_model.values[2].value
+                item = Commodity(name, commodity_type, resolution)
                 self.add_item(model, item)
         else:
             item = model.retrieve_data()[index]

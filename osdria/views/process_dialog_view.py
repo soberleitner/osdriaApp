@@ -7,7 +7,6 @@ from models.property import PropertyPopupMenu
 from models.data_structure import List
 
 from views.process_dialog_view_ui import Ui_ProcessDialog
-from views.components.property_edit import PropertyEdit
 from views.components.process_list_view import ListModel
 
 ICON_FILE = "Image files (*.png)"
@@ -67,6 +66,8 @@ class ProcessDialogView(QDialog):
         icon = QIcon()
         icon.addPixmap(QPixmap(":/icons/img/process_icon@2x.png"), QIcon.Normal, QIcon.Off)
         self._ui.button_icon.setIcon(icon)
+        self._section_popup_model.value = OverviewSelection.ENERGY
+        self._category_popup_model.value = ProcessCategory.SUPPLY
         self._ui.variables_list.setModel(ListModel([]))
         self._ui.data_list.setModel(ListModel([]))
         self._ui.properties_list.setModel(ListModel([]))
@@ -78,6 +79,8 @@ class ProcessDialogView(QDialog):
 
     def load_content(self, process):
         self._ui.button_icon.setIcon(process.icon)
+        self._section_popup_model.value = process.section
+        self._category_popup_model.value = process.category
         self._ui.variables_list.setModel(ListModel(process.variables.list))
         self._ui.data_list.setModel(ListModel(process.data.list))
         self._ui.properties_list.setModel(ListModel(process.properties))

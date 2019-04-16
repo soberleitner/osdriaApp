@@ -1,8 +1,8 @@
-from PySide2.QtCore import QSize, QPoint, QPointF, QLineF, QRect, Qt, QMargins
+from PySide2.QtCore import QSize, QPoint, QPointF, QLineF, QRect, Qt, QMargins, QByteArray
 from PySide2.QtGui import QPen, QBrush, QColor, QTransform, QCursor
 from PySide2.QtWidgets import QGraphicsScene, QGraphicsItemGroup, QGraphicsItem, QMenu, QAction, QMessageBox, QGraphicsLineItem
 
-from models.constants import MimeType, SelectConnect
+from models.constants import MimeType, SelectConnect, OverviewSelection
 from models.element import Process
 from models.data_structure import List
 
@@ -16,13 +16,13 @@ PROCESS_SIZE = 80
 
 
 class SectionScene(QGraphicsScene):
-    def __init__(self, section, model, process_cores):
+    def __init__(self, section, model, commodity_types, process_cores):
         super().__init__()
         self._grid_size = QSize(GRID_WIDTH, GRID_HEIGHT)
         self._drop_indicator = self.init_drop_indicator()
         self._process_items = QGraphicsItemGroup()
         self._commodity_items = List([])
-        self._bounding_rect = BoundingRect(section, model.process_list, model.commodity_list)
+        self._bounding_rect = BoundingRect(section, model.process_list, commodity_types)
         self._clicked_item = None
         self._item_mouse_offset = None
         self._connect_line = None
@@ -88,6 +88,7 @@ class SectionScene(QGraphicsScene):
         process = process_item.data(0)
         connections = process_item.data(1)
 
+        # define necessary connections to commodity item
         commodities = process.inputs if input_com else process.outputs
         for commodity in commodities:
             if commodity.commodity_type not in commodity_types:
@@ -152,12 +153,24 @@ class SectionScene(QGraphicsScene):
             if commodity_references == 0:
                 # remove commodity of section count and commodity item
                 commodity_item.data(0).locations.remove(self._section)
-                # if locations are empty remove whole commodity item
-                if not commodity_item.data(0).locations:
-                    self._model.commodity_list.remove(commodity_item.data(0))
                 self._commodity_items.remove(commodity_item)
                 self.removeItem(commodity_item)
             self.removeItem(connection_item)
+
+        # reduce connection count of all commodities connected to process
+        for input_com in process.inputs:
+            input_com.connection_count[self._section] -= 1
+            if input_com.connection_count[self._section] == 0:
+                input_com.connection_count.remove(self._section)
+                if not input_com.connection_count:
+                    self._model.commodity_list.remove(input_com)
+
+        for output in process.outputs:
+            output.connection_count[self._section] -= 1
+            if output.connection_count[self._section] == 0:
+                output.connection_count.remove(self._section)
+                if not output.connection_count:
+                    self._model.commodity_list.remove(output)
 
         self._process_items.removeFromGroup(item)
         self.removeItem(item)
@@ -213,14 +226,25 @@ class SectionScene(QGraphicsScene):
                 return
         else:
             selected_commodity = self._connect_line.data(1)
-            if selected_commodity in item.data(0).core.inputs:
-                self.connect_processes(selected_commodity, self._connect_line.data(0), item)
-            else:
-                # display message that commodity not available
-                QMessageBox.warning(self.views()[1],
-                                    "Connection failure",
-                                    "Commodity not available as inputs in selected process",
-                                    QMessageBox.Ok)
+            if isinstance(item, ProcessItem):
+                # create incoming connection
+                if selected_commodity in item.data(0).core.inputs:
+                    if self._connect_line.data(0) is None:
+                        # establish connection from commodity
+                        if selected_commodity not in item.data(0).inputs:
+                            self.connect_process(item.data(0), selected_commodity, False)
+                            self.draw_connection(item)
+                    else:
+                        # establish connection between processes
+                        self.connect_processes(selected_commodity, self._connect_line.data(0), item)
+            elif item is None:
+                # create outgoing connection
+                menu = QMenu()
+                menu.addAction("> Commodity")
+
+                if menu.exec_(QCursor.pos()):
+                    self.connect_process(self._connect_line.data(0).data(0), selected_commodity)
+                    self.draw_connection(self._connect_line.data(0), False)
 
         # end connection
         self.views()[1].setMouseTracking(False)
@@ -270,39 +294,43 @@ class SectionScene(QGraphicsScene):
         # determine necessary connection steps
         if commodity_in_input & commodity_in_output:
             # selected_commodity already exists in input and output -> connection exists
-            QMessageBox.warning(self.views()[1],
-                                "Connection exists",
-                                "Connection already established",
-                                QMessageBox.Ok)
+            QMessageBox.warning(self.views()[1], "Connection exists", "Connection already established", QMessageBox.Ok)
             return
         elif commodity_in_input:
             # add commodity to output of start process
-            start_process.outputs.add(connect_commodity)
-            self.set_commodity_position(connect_commodity.commodity_type, start_process)
+            self.connect_process(start_process, connect_commodity)
             self.draw_connection(start_process_item, False)
         elif commodity_in_output:
             # add commodity to input of end process
-            end_process.inputs.add(connect_commodity)
-            self.set_commodity_position(connect_commodity.commodity_type, end_process)
+            self.connect_process(end_process, connect_commodity, False)
             self.draw_connection(end_process_item)
         else:
             # establish new commodity in both processes
             connect_commodity = selected_commodity.copy()
-            start_process.outputs.add(connect_commodity)
-            end_process.inputs.add(connect_commodity)
 
-            self.set_commodity_position(connect_commodity.commodity_type, start_process)
-            self.set_commodity_position(connect_commodity.commodity_type, end_process)
+            self.connect_process(start_process, connect_commodity)
+            self.connect_process(end_process, connect_commodity, False)
             self.draw_connection(start_process_item, False)
             self.draw_connection(end_process_item)
 
-    def set_commodity_position(self, commodity_type, process):
+    def connect_process(self, process, commodity, output=True):
+        if self._section not in commodity.connection_count.keys():
+            commodity.connection_count[self._section] = 0
+        if commodity not in self._model.commodity_list:
+            self._model.commodity_list.add(commodity)
+        commodity.connection_count[self._section] += 1
+
+        commodity_list = process.outputs if output else process.inputs
+        commodity_list.add(commodity)
+
+        self.set_commodity_position(commodity.commodity_type, process, output)
+
+    def set_commodity_position(self, commodity_type, process, right=True):
         """changes the commodity position according to newly connected process"""
         if self._section not in commodity_type.locations.keys():
             # set initial position to right of process
-            commodity_type.locations[self._section] = process.coordinate.x() + self._grid_size.width()
-            if commodity_type not in self._model.commodity_list:
-                self._model.commodity_list.add(commodity_type)
+            location = process.coordinate.x() + self._grid_size.width() * (1 if right else -1)
+            commodity_type.locations[self._section] = location
         else:
             # todo change position based on newly connected process
             pass
@@ -378,10 +406,23 @@ class SectionScene(QGraphicsScene):
         super().mouseMoveEvent(event)
 
     def mouseReleaseEvent(self, event):
-        # prevent action in normal mode
+        # normal mode
         if not self.draft_mode:
+            if event.button() == Qt.LeftButton:
+                # toggle sidebar with properties
+                clicked_item = self.itemAt(event.scenePos(), QTransform())
+                if self._clicked_item:
+                    if isinstance(clicked_item, ProcessItem):
+                        self.views()[0].sidebar_toggled.emit(clicked_item.data(0).properties)
+                    elif isinstance(clicked_item, CommodityItem):
+                        self.views()[0].sidebar_toggled.emit(clicked_item.data(0).properties)
+                    else:
+                        self.views()[0].sidebar_toggled.emit(List([]))
+                else:
+                    self.views()[0].sidebar_toggled.emit(List([]))
             return
 
+        # draft mode in selection
         if self.edit_mode == SelectConnect.SELECT:
             # release process item
             if self._clicked_item:
@@ -401,14 +442,7 @@ class SectionScene(QGraphicsScene):
             # connecting processes
             if event.button() == Qt.LeftButton:
                 clicked_item = self.itemAt(event.scenePos(), QTransform())
-                if self._clicked_item:
-                    if isinstance(clicked_item, ProcessItem):
-                        self.execute_connection(clicked_item, event.scenePos())
-                        return
-
-                self.views()[1].setMouseTracking(False)
-                self.removeItem(self._connect_line)
-                self._connect_line = None
+                self.execute_connection(clicked_item, event.scenePos())
 
         super().mouseReleaseEvent(event)
 
@@ -428,7 +462,7 @@ class SectionScene(QGraphicsScene):
         if len(self.collidingItems(self._drop_indicator)) > 0:
             return
 
-        core_name = event.mimeData().data(MimeType.PROCESS_CORE.value)
+        core_name = event.mimeData().data(MimeType.PROCESS_CORE.value).data().decode('UTF-8')
         process_core = list(filter(lambda element: element.name == core_name, self._cores))[0]
 
         # define name based on process core and existing names
@@ -472,8 +506,31 @@ class SectionScene(QGraphicsScene):
                     self._clicked_item = None
         else:
             # open context menu for commodities of other sections
-            # todo add commodity context menu
-            pass
+            menu = QMenu()
+            section_list = [item for item in OverviewSelection
+                            if item is not self._section and item is not OverviewSelection.OVERVIEW]
+            for section in section_list:
+                submenu = QMenu(section.name)
+                section_coms = [commodity for commodity in self._model.commodity_list
+                                if section in commodity.connection_count.keys()]
+                for commodity in section_coms:
+                    action = submenu.addAction(str(commodity))
+                    action.setData(commodity)
+
+                # only add sub menu if commodities are available
+                if section_coms:
+                    menu.addMenu(submenu)
+
+            # execute menu
+            action = menu.exec_(QCursor.pos())
+            if action:
+                # start connection
+                line_pen = QPen(Qt.lightGray, 1, Qt.DashLine)
+                line = QLineF(event.scenePos(), event.scenePos())
+                self._connect_line = self.addLine(line, line_pen)
+                self._connect_line.setData(0, None)
+                self._connect_line.setData(1, action.data())
+                self.views()[1].setMouseTracking(True)
 
     def setSceneRect(self, rect):
         """set sceneRect to view boundaries if necessary space is less"""
@@ -485,8 +542,9 @@ class BoundingRect(QRect):
     def __init__(self, section, process_list, commodity_list):
         super().__init__(0, 0, 0, 0)
         self._section = section
-        self._processes = process_list
-        self._commodities = commodity_list
+        self._processes = [process for process in process_list if process.core.section is self._section]
+        self._commodities = [commodity_type for commodity_type in commodity_list
+                             if self._section in commodity_type.locations.keys()]
 
     def update(self):
         # todo extend/reduce sceneRect with position of elements

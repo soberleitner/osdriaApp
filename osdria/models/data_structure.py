@@ -26,7 +26,7 @@ class List(QObject):
             if element_type is str:
                 output.writeString(list_element)
             elif element_type is int:
-                output.writeUInt32(list_element)
+                output.writeInt64(list_element)
             elif element_type is float:
                 output.writeFloat(list_element)
             else:
@@ -51,7 +51,7 @@ class List(QObject):
             if element_class == str:
                 element = input_.readString()
             elif element_class == int:
-                element = input_.readUInt32()
+                element = input_.readInt64()
             elif element_class == float:
                 element = input_.readFloat()
             else:
@@ -128,7 +128,7 @@ class Dict(QObject):
             if element_type is str:
                 output.writeString(list_element)
             elif element_type is int:
-                output.writeUInt32(list_element)
+                output.writeInt64(list_element)
             elif element_type is float:
                 output.writeFloat(list_element)
             else:
@@ -167,7 +167,7 @@ class Dict(QObject):
             if element_class == str:
                 element = input_.readString()
             elif element_class == int:
-                element = input_.readUInt32()
+                element = input_.readInt64()
             elif element_class == float:
                 element = input_.readFloat()
             else:

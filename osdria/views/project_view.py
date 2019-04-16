@@ -25,6 +25,8 @@ class ProjectView(QMainWindow):
             self._project_ctrl.open_commodity_dialog)
         self._ui.action_processes.triggered.connect(
             self._project_ctrl.open_process_dialog)
+        self._ui.action_timeseries.triggered.connect(
+            self._project_ctrl.open_time_series_dialog)
         self._ui.action_scenarios.triggered.connect(
             self._project_ctrl.open_scenario_dialog)
         self._ui.action_execute.triggered.connect(
@@ -50,6 +52,7 @@ class ProjectView(QMainWindow):
         self._ui.tool_sidebar_sections.clicked.connect(
             lambda: self._project_ctrl.toggle_sidebar(PageType.SECTIONS))
         # sections content
+        self._ui.section_view.sidebar_toggled.connect(self.show_section_sidebar)
 
         # draft toolbar
         self._ui.tool_back_draft.clicked.connect(
@@ -117,10 +120,14 @@ class ProjectView(QMainWindow):
         self._ui.scenario_select.set_model(self._model.scenarios)
         self._ui.sidebar_overview.load_data(self._model.overview_properties)
         self._section_scenes = List([
-            SectionScene(OverviewSelection.ENERGY, self._model.project_elements, self._model.process_cores),
-            SectionScene(OverviewSelection.WATER, self._model.project_elements, self._model.process_cores),
-            SectionScene(OverviewSelection.FOOD, self._model.project_elements, self._model.process_cores),
-            SectionScene(OverviewSelection.BUSINESS, self._model.project_elements, self._model.process_cores),
+            SectionScene(OverviewSelection.ENERGY, self._model.project_elements,
+                         self._model.commodities, self._model.process_cores),
+            SectionScene(OverviewSelection.WATER, self._model.project_elements,
+                         self._model.commodities, self._model.process_cores),
+            SectionScene(OverviewSelection.FOOD, self._model.project_elements,
+                         self._model.commodities, self._model.process_cores),
+            SectionScene(OverviewSelection.BUSINESS, self._model.project_elements,
+                         self._model.commodities, self._model.process_cores),
         ])
         self._ui.section_view.setScene(self._section_scenes[OverviewSelection.ENERGY.value])
         self._ui.draft_view.setScene(self._section_scenes[OverviewSelection.ENERGY.value])
@@ -188,6 +195,13 @@ class ProjectView(QMainWindow):
             self._ui.title_graph.setText(commodity.name)
         else:
             self._ui.tool_graph.hide()
+
+    def show_section_sidebar(self, properties):
+        if properties:
+            self._project_ctrl.toggle_sidebar(PageType.SECTIONS, True)
+            self._ui.sidebar_sections.load_data(properties, PageType.SECTIONS)
+        else:
+            self._project_ctrl.toggle_sidebar(PageType.SECTIONS, False)
 
     def closeEvent(self, event):
         self._model.save()
