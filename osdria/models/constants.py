@@ -107,7 +107,7 @@ class PyomoVarType(Enum):
     POSITIVE_REALS
     NON_NEGATIVE_REALS
     INTEGERS
-    POSTIVIE_INTEGERS
+    POSITIVE_INTEGERS
     NON_NEGATIVE_INTEGERS
     BOOLEAN"""
     REALS = "Reals"
@@ -115,7 +115,7 @@ class PyomoVarType(Enum):
     NON_NEGATIVE_REALS = "NonNegativeReals"
     INTEGERS = "Integers"
     POSITIVE_INTEGERS = "PositiveIntegers"
-    NON_NEGATIVE_INTEGERS = "NonPositiveIntegers"
+    NON_NEGATIVE_INTEGERS = "NonNegativeIntegers"
     BOOLEAN = "Boolean"
 
     def __str__(self):

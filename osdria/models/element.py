@@ -233,7 +233,7 @@ class CommodityType(QObject):
         self.properties.read(input_)
 
     def __str__(self):
-        return self._name
+        return self.properties[0].value
 
 
 class Commodity(QObject):

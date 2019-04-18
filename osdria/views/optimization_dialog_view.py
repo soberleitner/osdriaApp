@@ -1,5 +1,6 @@
 from PySide2.QtCore import Qt, QObject, QSize, QModelIndex, Signal
-from PySide2.QtWidgets import QDialog, QStyledItemDelegate, QPushButton, QWidget, QStyle, QHeaderView
+from PySide2.QtGui import QKeySequence
+from PySide2.QtWidgets import QDialog, QStyledItemDelegate, QPushButton, QWidget, QStyle, QHeaderView, QFileDialog
 
 from views.optimization_dialog_view_ui import Ui_OptimizationDialog
 
@@ -43,4 +44,9 @@ class OptimizationDialogView(QDialog):
         """prevent dialog closing with enter or return key"""
         if event.key() == Qt.Key_Enter or event.key() == Qt.Key_Return:
             return
+        elif event.matches(QKeySequence.Print):
+            file_name = QFileDialog.getSaveFileName(self, "Export Pyomo Model", "model.txt")[0]
+            file = open(file_name, "w")
+            file.write(self._ctrl.get_model())
+            file.close()
         super().keyPressEvent(event)

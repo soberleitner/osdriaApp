@@ -68,17 +68,20 @@ class PropertyValue(QObject):
     def unit(self, value):
         self._unit = value
 
+
 class PropertyVariable(QObject):
     """data stored for property variable
         @param: name(str)
         @param: resolution(DatasetResolution)
-        @param: pyomo_type(PyomoVarType)"""
+        @param: pyomo_type(PyomoVarType)
+        @param: unit(str)"""
 
-    def __init__(self, name="", resolution=DatasetResolution.YEARLY, pyomo_type=PyomoVarType.REALS):
+    def __init__(self, name="", resolution=DatasetResolution.YEARLY, pyomo_type=PyomoVarType.REALS, unit=""):
         super().__init__()
         self._name = name
         self._resolution = resolution
         self._type = pyomo_type
+        self._unit = unit
 
     def __str__(self):
         return self._name
@@ -88,12 +91,14 @@ class PropertyVariable(QObject):
         output.writeString(self._name)
         output.writeUInt32(self._resolution.value)
         output.writeString(self._type.value)
+        output.writeString(self._unit)
 
     def read(self, input_):
         """read data from input stream"""
         self._name = input_.readString()
         self._resolution = DatasetResolution(input_.readUInt32())
         self._type = PyomoVarType(input_.readString())
+        self._unit = input_.readString()
 
     @property
     def name(self):
@@ -106,6 +111,10 @@ class PropertyVariable(QObject):
     @property
     def pyomo_type(self):
         return self._type
+
+    @property
+    def unit(self):
+        return self._unit
 
 class PropertyValueTimeSeries(PropertyValue):
     """data stored for property value representing a times series
@@ -158,6 +167,7 @@ class PropertyLineEdit(PropertyValue):
 
     def __init__(self, name="", value="", unit=""):
         super().__init__(name, value, unit)
+        self.read_only = False
 
     def copy(self):
         return PropertyLineEdit(self.name, self.value, self.unit)

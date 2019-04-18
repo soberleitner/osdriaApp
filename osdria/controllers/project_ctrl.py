@@ -147,3 +147,6 @@ class ProjectCtrl(QObject):
 
     def change_zoom_mode(self, zoom_type):
         self._model.graph_zoom_mode = zoom_type
+
+    def set_current_commodity(self, commodity):
+        self._model.current_commodity = commodity

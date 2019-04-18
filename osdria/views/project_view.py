@@ -2,7 +2,9 @@ from PySide2.QtWidgets import *
 
 from views.components.section_scene import SectionScene
 from views.project_view_ui import Ui_MainWindow
-from models.constants import OverviewSelection, PageType, SelectConnect, ZoomType, ProcessCategory
+
+from models.constants import OverviewSelection, PageType, SelectConnect, ZoomType, ProcessCategory, DatasetResolution
+from models.property import PropertyPopupMenu, PropertyLineEdit
 from models.data_structure import List
 
 
@@ -47,12 +49,11 @@ class ProjectView(QMainWindow):
         self._ui.tool_back_sections.clicked.connect(
             lambda: self._project_ctrl.change_page(PageType.OVERVIEW))
         self._ui.tool_draft.clicked.connect(self.on_draft_mode)
-        self._ui.tool_graph.clicked.connect(
-            lambda: self._project_ctrl.change_page(PageType.GRAPH))
         self._ui.tool_sidebar_sections.clicked.connect(
             lambda: self._project_ctrl.toggle_sidebar(PageType.SECTIONS))
         # sections content
         self._ui.section_view.sidebar_toggled.connect(self.show_section_sidebar)
+        self._ui.section_view.commodity_clicked.connect(self._project_ctrl.set_current_commodity)
 
         # draft toolbar
         self._ui.tool_back_draft.clicked.connect(
@@ -70,8 +71,6 @@ class ProjectView(QMainWindow):
         # graph toolbar
         self._ui.tool_back_graph.clicked.connect(
             lambda: self._project_ctrl.change_page(PageType.SECTIONS))
-        self._ui.select_commodity.currentIndexChanged.connect(
-            self._project_ctrl.change_graph_commodity)
         self._ui.tool_export_graph.clicked.connect(
             self._project_ctrl.open_export_dialog)
         self._ui.tool_cursor_graph.clicked.connect(
@@ -178,6 +177,8 @@ class ProjectView(QMainWindow):
         else:
             self._ui.tool_zoom_range.setChecked()
 
+        self._ui.commodity_flow_view.set_zoom_mode(zoom_type)
+
     def on_draft_mode(self):
         """draft tool button clicked"""
         section_cores = list(filter(lambda core: core.section == self._model.current_section,
@@ -189,16 +190,38 @@ class ProjectView(QMainWindow):
         self._ui.draftbar.load_data(cores, PageType.DRAFT)
         self._project_ctrl.change_page(PageType.DRAFT)
 
-    def on_commodity_change(self, commodity):
-        if commodity is not None:
-            self._ui.tool_graph.show()
-            self._ui.title_graph.setText(commodity.name)
-        else:
-            self._ui.tool_graph.hide()
+    def on_commodity_change(self, commodity_type):
+        if commodity_type is not None:
+            self._ui.title_graph.setText(str(commodity_type))
+            commodities = list(filter(lambda commodity: commodity.commodity_type is commodity_type,
+                                      self._model.project_elements.commodity_list))
+            commodity_model = PropertyPopupMenu("Commodities", List(commodities))
+            commodity_model.value_changed.connect(lambda: self.on_commodity_choose(commodity_model.value))
+            self._ui.commodity_select.set_model(commodity_model)
+            self.on_commodity_choose(commodity_model.value)
 
-    def show_section_sidebar(self, properties):
-        if properties:
+            self._project_ctrl.change_page(PageType.GRAPH)
+
+    def on_commodity_choose(self, commodity):
+        self._ui.commodity_flow_view.set_data(commodity.optimization_output)
+
+    def show_section_sidebar(self, process):
+        if process:
             self._project_ctrl.toggle_sidebar(PageType.SECTIONS, True)
+
+            properties = []
+            properties.extend(process.properties.list)
+            # extend shown property list with optimization variables that have single values
+            if process.optimization_output:
+                single_variables = list(filter(lambda var: var.resolution is DatasetResolution.YEARLY,
+                                               process.core.variables))
+                for variable in single_variables:
+                    # display 3 significant figures
+                    display_value = str(float('%.3g' % process.optimization_output[variable.name][0]))
+                    optimization_variable = PropertyLineEdit(variable.name, display_value, variable.unit)
+                    optimization_variable.read_only = True
+                    properties.append(optimization_variable)
+
             self._ui.sidebar_sections.load_data(properties, PageType.SECTIONS)
         else:
             self._project_ctrl.toggle_sidebar(PageType.SECTIONS, False)

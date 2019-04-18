@@ -5,8 +5,9 @@ import pyomo.core.kernel.set_types as var_types
 
 from models.constants import DatasetResolution
 from models.property import PropertyValueTimeSeries
+from models.data_structure import List, Dict
 
-SOLVER = 'glpk'
+SOLVER = 'gurobi'
 
 
 class Optimizer:
@@ -50,25 +51,48 @@ class Optimizer:
         results = opt.solve(self._model)
         print(results)
 
+    def get_model(self):
+        """return model expressions"""
+        print("Variables")
+        model_expr = "Variables:\n"
+        for variable in self._model.component_data_objects(Var):
+            model_expr += str(variable) + " ... " + str(variable.domain) + "\n"
+        model_expr += "Parameters:\n"
+        for parameter in self._model.component_data_objects(Param):
+            model_expr += str(parameter) + "\n"
+        print("Constraints")
+        model_expr += "Constraints:\n"
+        for constraint in self._model.component_data_objects(Constraint):
+            model_expr += str(constraint.expr) + "\n"
+        print("Objective")
+        model_expr += "Objective:\n"
+        for objective in self._model.component_data_objects(Objective):
+            model_expr += str(objective.expr) + "\n"
+        print("Done")
+
+        return model_expr
+
     def set_results(self):
         """set optimization results in processes and commodities"""
         for process in self._processes:
+            process.optimization_output = Dict({})
             process_code_name = process.name.lower().replace(" ", "_")
             for variable in process.core.variables:
                 variable_code_name = variable.name.lower().replace(" ", "_")
                 unique_name = process_code_name + "__" + variable_code_name
-                process.optimization_output[variable] = [result for result in
-                                                         self._model.component(unique_name).get_values().values()]
+                process.optimization_output[variable.name] = List([result for result in
+                                                         self._model.component(unique_name).get_values().values()])
 
         # set commodity flow results
         for commodity in self._commodities:
+            commodity.optimization_output = Dict({"input_processes": Dict({}), "output_processes": Dict({})})
             commodity_code_name = commodity.name.lower().replace(" ", "_")
             for process_direction in ["input_processes", "output_processes"]:
                 for process_name in self._commodity_list[commodity.name][process_direction]:
                     process_code_name = process_name.lower().replace(" ", "_")
                     commodity_process_name = commodity_code_name + "__" + process_code_name
                     commodity.optimization_output[process_direction][process_name] = \
-                        [result for result in self._model.component(commodity_process_name).get_values().values()]
+                        List([result for result in self._model.component(commodity_process_name).get_values().values()])
 
 
     def cancel(self):
@@ -165,7 +189,7 @@ class Optimizer:
         if obj == "":
             return obj
 
-        for index, objective_term in enumerate(obj.split("+")):
+        for index, objective_term in enumerate(obj.split("++")):
             unique_name = process_code_name + "__objective_term_" + str(index)
             term = objective_term.strip()
             term = term.replace("[y]", "[0]")

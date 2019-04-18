@@ -24,5 +24,8 @@ class OptimizationDialogCtrl(QObject):
 
         self._model.optimization_text = "DONE"
 
+    def get_model(self):
+        return self._optimizer.get_model()
+
     def cancel_optimization(self):
         self._optimizer.cancel()

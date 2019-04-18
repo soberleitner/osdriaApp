@@ -35,7 +35,7 @@ class PropertyEdit(QLineEdit):
         elif model.type == PropType.DIALOG:
             self.setReadOnly(True)
         elif model.type == PropType.LINE_EDIT:
-            self.setReadOnly(False)
+            self.setReadOnly(model.read_only)
             # display of content done by self.focusOutEvent()
             self._model.value_changed.disconnect()
 
@@ -51,11 +51,12 @@ class PropertyEdit(QLineEdit):
 
     def set_popup(self, value):
         self._popup = value
-        dropdown_icon = QIcon()
-        dropdown_icon.addPixmap(QPixmap(":/icons/img/dropdown_normal@2x.png"), QIcon.Normal, QIcon.Off)
-        dropdown_icon.actualSize(QSize(10, 10))
-        popup_action = self.addAction(dropdown_icon, QLineEdit.TrailingPosition)
-        popup_action.triggered.connect(self.show_popup)
+        if not self.actions():
+            dropdown_icon = QIcon()
+            dropdown_icon.addPixmap(QPixmap(":/icons/img/dropdown_normal@2x.png"), QIcon.Normal, QIcon.Off)
+            dropdown_icon.actualSize(QSize(10, 10))
+            popup_action = self.addAction(dropdown_icon, QLineEdit.TrailingPosition)
+            popup_action.triggered.connect(self.show_popup)
 
     def mousePressEvent(self, event):
         super().setText(self.text())

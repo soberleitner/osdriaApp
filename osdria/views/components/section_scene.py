@@ -1,4 +1,4 @@
-from PySide2.QtCore import QSize, QPoint, QPointF, QLineF, QRect, Qt, QMargins, QByteArray
+from PySide2.QtCore import QSize, QPoint, QPointF, QLineF, QRect, QRectF, Qt, QMargins, QByteArray
 from PySide2.QtGui import QPen, QBrush, QColor, QTransform, QCursor
 from PySide2.QtWidgets import QGraphicsScene, QGraphicsItemGroup, QGraphicsItem, QMenu, QAction, QMessageBox, QGraphicsLineItem
 
@@ -9,6 +9,7 @@ from models.data_structure import List
 GRID_WIDTH = 100
 GRID_HEIGHT = 100
 MIN_GRID_MARGIN = 10
+COMMODITY_LINE_WIDTH = 22
 DROP_INDICATOR_SIZE = 5
 ARROW_SIZE = 10
 
@@ -71,7 +72,6 @@ class SectionScene(QGraphicsScene):
                 process_item = self.draw_process(process)
                 self.draw_connection(process_item)
                 self.draw_connection(process_item, False)
-        self._bounding_rect.update()
         self.update_commodities()
 
     def draw_commodity(self, commodity):
@@ -175,7 +175,6 @@ class SectionScene(QGraphicsScene):
         self._process_items.removeFromGroup(item)
         self.removeItem(item)
 
-        self._bounding_rect.update()
         self.update_commodities()
 
     def init_drop_indicator(self):
@@ -337,11 +336,11 @@ class SectionScene(QGraphicsScene):
 
     def update_commodities(self):
         """update length of commodity line based on bounding rect"""
+        self._bounding_rect.update()
         top_border = self._bounding_rect.top()
-        bottom_border = self._bounding_rect.bottom()
+        height_border = self._bounding_rect.height()
         for commodity_item in self._commodity_items:
-            line = commodity_item.line()
-            commodity_item.setLine(line.x1(), top_border, line.x2(), bottom_border)
+            commodity_item.update_line(top_border, height_border)
 
     def drawBackground(self, painter, rect):
         if self.draft_mode:
@@ -413,13 +412,17 @@ class SectionScene(QGraphicsScene):
                 clicked_item = self.itemAt(event.scenePos(), QTransform())
                 if self._clicked_item:
                     if isinstance(clicked_item, ProcessItem):
-                        self.views()[0].sidebar_toggled.emit(clicked_item.data(0).properties)
+                        self.views()[0].sidebar_toggled.emit(clicked_item.data(0))
+                        self.views()[0].commodity_clicked.emit(None)
                     elif isinstance(clicked_item, CommodityItem):
-                        self.views()[0].sidebar_toggled.emit(clicked_item.data(0).properties)
+                        self.views()[0].sidebar_toggled.emit(None)
+                        self.views()[0].commodity_clicked.emit(clicked_item.data(0))
                     else:
-                        self.views()[0].sidebar_toggled.emit(List([]))
+                        self.views()[0].sidebar_toggled.emit(None)
+                        self.views()[0].commodity_clicked.emit(None)
                 else:
-                    self.views()[0].sidebar_toggled.emit(List([]))
+                    self.views()[0].sidebar_toggled.emit(None)
+                    self.views()[0].commodity_clicked.emit(None)
             return
 
         # draft mode in selection
@@ -481,7 +484,6 @@ class SectionScene(QGraphicsScene):
 
         # create process item and connections
         self.draw_process(process)
-        self._bounding_rect.update()
         self.update_commodities()
 
         self.disable_drop_indicator()
@@ -542,19 +544,19 @@ class BoundingRect(QRect):
     def __init__(self, section, process_list, commodity_list):
         super().__init__(0, 0, 0, 0)
         self._section = section
-        self._processes = [process for process in process_list if process.core.section is self._section]
-        self._commodities = [commodity_type for commodity_type in commodity_list
-                             if self._section in commodity_type.locations.keys()]
+        self._processes = process_list
+        self._commodities = commodity_list
 
     def update(self):
         # todo extend/reduce sceneRect with position of elements
+        processes = [process for process in self._processes if process.core.section is self._section]
         # set rect to initial value if no items exist
-        if not self._processes:
+        if not processes:
             self.setRect(0, 0, 0, 0)
             return
 
-        process_x_coordinates = [process.coordinate.x() for process in self._processes]
-        process_y_coordinates = [process.coordinate.y() for process in self._processes]
+        process_x_coordinates = [process.coordinate.x() for process in processes]
+        process_y_coordinates = [process.coordinate.y() for process in processes]
         commodity_x_coordinates = [commodity.locations[self._section] for commodity in self._commodities
                                    if self._section in commodity.locations.keys()]
         commodity_x_coordinates.extend([min(process_x_coordinates) - PROCESS_SIZE/2,
@@ -609,12 +611,34 @@ class ProcessItem(QGraphicsItem):
 
 
 # todo create QGraphicsItem class for commodity
-class CommodityItem(QGraphicsLineItem):
+class CommodityItem(QGraphicsItem):
     """create vertical commodity line"""
 
     def __init__(self, x_position, rect):
-        super().__init__(x_position, rect.top(), x_position, rect.bottom())
-        super().setPen(QPen(Qt.black, 2))
+        super().__init__()
+        self.setAcceptHoverEvents(True)
+        self._x = x_position
+        self._top = rect.top()
+        self._height = rect.height()
+
+    def boundingRect(self):
+        return QRectF(-COMMODITY_LINE_WIDTH/2, self._top, COMMODITY_LINE_WIDTH, self._height)
+
+    def paint(self, painter, option, widget=None):
+        painter.setPen(QPen(Qt.black, 2))
+        painter.drawLine(0, self._top, 0, self._top + self._height)
+
+    def update_line(self, top, height):
+        old_bounding_rect = self.boundingRect()
+        self._top = top
+        self._height = height
+        self.update(old_bounding_rect)
+
+    def hoverEnterEvent(self, event):
+        event.widget().setCursor(Qt.PointingHandCursor)
+
+    def hoverLeaveEvent(self, event):
+        event.widget().unsetCursor()
 
 
 # todo create connection item

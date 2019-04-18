@@ -25,14 +25,16 @@ class ProcessDialogCtrl(QObject):
             return
 
         dialog_model = PropertyDialog("Add Variable", [PropertyLineEdit("Name"),
+                                                       PropertyLineEdit("Unit"),
                                                        PropertyPopupMenu("Resolution", List(list(DatasetResolution))),
                                                        PropertyPopupMenu("Pyomo Type", List(list(PyomoVarType)))])
         self.show_dialog(dialog_model)
 
         name = dialog_model.values[0].value
-        resolution = dialog_model.values[1].value
-        pyomo_type = dialog_model.values[2].value
-        item = PropertyVariable(name, resolution, pyomo_type)
+        unit = dialog_model.values[1].value
+        resolution = dialog_model.values[2].value
+        pyomo_type = dialog_model.values[3].value
+        item = PropertyVariable(name, resolution, pyomo_type, unit)
         self.add_item(model, item)
 
     def change_data(self, command, index, model):
