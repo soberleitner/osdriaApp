@@ -106,7 +106,7 @@ class ProjectCtrl(QObject):
         dialog_model = OptimizationModel(self._model.project_elements)
         optimization_ctrl = OptimizationDialogCtrl(dialog_model)
         optimization_view = OptimizationDialogView(dialog_model, optimization_ctrl)
-        optimization_view.exec_()
+        optimization_view.show()
 
     def open_export_dialog(self):
         print("open_export_dialog")

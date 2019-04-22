@@ -19,23 +19,38 @@ class ProcessDialogCtrl(QObject):
         self._commodities = commodity_list
         self._time_series = time_series_list
 
-    def change_variables(self, command, _, model):
-        # Ignore edit command in variables (alternative workflow: delete & add)
-        if command == "Edit":
-            return
+    def change_variables(self, command, index, model):
+        if command == "Add":
+            # create model for dialog
+            dialog_model = PropertyDialog("Add Variable", [PropertyLineEdit("Name"),
+                                                           PropertyLineEdit("Unit"),
+                                                           PropertyPopupMenu("Resolution", List(list(DatasetResolution))),
+                                                           PropertyPopupMenu("Pyomo Type", List(list(PyomoVarType)))])
+            if self.show_dialog(dialog_model):
+                # retrieve data from dialog model
+                name = dialog_model.values[0].value
+                unit = dialog_model.values[1].value
+                resolution = dialog_model.values[2].value
+                pyomo_type = dialog_model.values[3].value
+                item = PropertyVariable(name, resolution, pyomo_type, unit)
+                # set list view data
+                self.add_item(model, item)
 
-        dialog_model = PropertyDialog("Add Variable", [PropertyLineEdit("Name"),
-                                                       PropertyLineEdit("Unit"),
-                                                       PropertyPopupMenu("Resolution", List(list(DatasetResolution))),
-                                                       PropertyPopupMenu("Pyomo Type", List(list(PyomoVarType)))])
-        self.show_dialog(dialog_model)
-
-        name = dialog_model.values[0].value
-        unit = dialog_model.values[1].value
-        resolution = dialog_model.values[2].value
-        pyomo_type = dialog_model.values[3].value
-        item = PropertyVariable(name, resolution, pyomo_type, unit)
-        self.add_item(model, item)
+        else:
+            # create model for dialog
+            item = model.retrieve_data()[index]
+            dialog_model = PropertyDialog("Edit Variable", [PropertyLineEdit("Unit", item.unit),
+                                                           PropertyPopupMenu("Resolution",
+                                                                             List(list(DatasetResolution)),
+                                                                             item.resolution),
+                                                           PropertyPopupMenu("Pyomo Type",
+                                                                             List(list(PyomoVarType)),
+                                                                             item.pyomo_type)])
+            if self.show_dialog(dialog_model):
+                # retrieve data from dialog model
+                item.unit = dialog_model.values[0].value
+                item.resolution = dialog_model.values[1].value
+                item.pyomo_type = dialog_model.values[2].value
 
     def change_data(self, command, index, model):
         if command == "Add":
@@ -98,9 +113,13 @@ class ProcessDialogCtrl(QObject):
         else:
             item = model.retrieve_data()[index]
             dialog_model = PropertyDialog(command + " Commodity",
-                                          [PropertyPopupMenu("Type", self._commodities, item.commodity_type)])
+                                          [PropertyPopupMenu("Type", self._commodities, item.commodity_type),
+                                           PropertyPopupMenu("Resolution",
+                                                             List(list(DatasetResolution)),
+                                                             item.resolution)])
             if self.show_dialog(dialog_model):
                 item.commodity_type = dialog_model.values[0].value
+                item.resolution = dialog_model.values[1].value
 
     def transfer_data(self, new_process, name, section, category, icon,
                       variables_data, data_data, properties_data, inputs_data, outputs_data,

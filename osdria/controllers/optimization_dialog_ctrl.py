@@ -1,4 +1,4 @@
-from PySide2.QtCore import QObject
+from PySide2.QtCore import QObject, QCoreApplication
 
 from core.optimization_tool import Optimizer
 
@@ -14,14 +14,18 @@ class OptimizationDialogCtrl(QObject):
         self._optimizer = Optimizer(self._model.process_list, self._model.commodity_list)
 
         self._model.optimization_text = "Converting Optimization Code"
+        QCoreApplication.processEvents()
         self._optimizer.translate()
 
         self._model.optimization_text = "Running Optimization"
+        QCoreApplication.processEvents()
         self._optimizer.solve()
 
         self._model.optimization_text = "Retrieving Results"
+        QCoreApplication.processEvents()
         self._optimizer.set_results()
 
+        QCoreApplication.processEvents()
         self._model.optimization_text = "DONE"
 
     def get_model(self):

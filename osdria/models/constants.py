@@ -117,6 +117,10 @@ class PyomoVarType(Enum):
     POSITIVE_INTEGERS = "PositiveIntegers"
     NON_NEGATIVE_INTEGERS = "NonNegativeIntegers"
     BOOLEAN = "Boolean"
+    HOURLY = "Index Hourly"
+    DAILY = "Index Daily"
+    WEEKLY = "Index Weekly"
+    MONTHLY = "Index Monthly"
 
     def __str__(self):
         return self.value

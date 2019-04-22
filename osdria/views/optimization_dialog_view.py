@@ -7,7 +7,6 @@ from views.optimization_dialog_view_ui import Ui_OptimizationDialog
 
 class OptimizationDialogView(QDialog):
     """Optimization Dialog View"""
-    dialog_shown = Signal()
 
     def __init__(self, dialog_model, dialog_controller):
         settings = Qt.Window | Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint
@@ -20,7 +19,6 @@ class OptimizationDialogView(QDialog):
         self._ui.setupUi(self)
 
         """connect widgets to controller"""
-        self.dialog_shown.connect(self._ctrl.run_optimization)
         self._ui.cancel_button.clicked.connect(self.reject)
         self.rejected.connect(self._ctrl.cancel_optimization)
 
@@ -30,15 +28,11 @@ class OptimizationDialogView(QDialog):
         """initialize view"""
         self._model.optimization_text = "Optimization Started"
 
-    def on_text_changed(self, text):
-        """change text of label"""
-        self._ui.information_text.setText(text)
-        if text == "DONE":
-            self.accept()
-
-    def exec_(self, *args, **kwargs):
-        self.dialog_shown.emit()
-        return super().exec_(*args, **kwargs)
+    def show(self):
+        super().show()
+        self.setModal(True)
+        self._ctrl.run_optimization()
+        self.close()
 
     def keyPressEvent(self, event):
         """prevent dialog closing with enter or return key"""

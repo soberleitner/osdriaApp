@@ -39,7 +39,7 @@
        <number>0</number>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="overview">
        <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0">
@@ -1702,7 +1702,7 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="CommodityFlowGraph" name="commodity_flow_view"/>
+           <widget class="FlowGraph" name="commodity_flow_view" native="true"/>
           </item>
           <item>
            <widget class="QGraphicsView" name="commodity_storage_view"/>
@@ -1835,9 +1835,10 @@
    <header>views/components/scene_view.h</header>
   </customwidget>
   <customwidget>
-   <class>CommodityFlowGraph</class>
-   <extends>QGraphicsView</extends>
-   <header>views/components/commodity_flow_graph.h</header>
+   <class>FlowGraph</class>
+   <extends>QWidget</extends>
+   <header>views/components/flow_graph.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>

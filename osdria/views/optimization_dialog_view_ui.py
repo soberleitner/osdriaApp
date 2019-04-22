@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'optimization_dialog_view.ui',
 # licensing of 'optimization_dialog_view.ui' applies.
 #
-# Created: Fri Apr  5 09:11:29 2019
+# Created: Sat Apr 20 07:34:01 2019
 #      by: pyside2-uic  running on PySide2 5.12.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -55,19 +55,20 @@ class Ui_OptimizationDialog(object):
         self.verticalLayout_3.addLayout(self.horizontalLayout_3)
         self.horizontalLayout_4 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_4.setObjectName("horizontalLayout_4")
-        spacerItem3 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_4.addItem(spacerItem3)
         self.information_text = QtWidgets.QLabel(self.dialog_frame)
+        font = QtGui.QFont()
+        font.setFamily("Arial")
+        font.setPointSize(15)
+        self.information_text.setFont(font)
+        self.information_text.setAlignment(QtCore.Qt.AlignCenter)
         self.information_text.setObjectName("information_text")
         self.horizontalLayout_4.addWidget(self.information_text)
-        spacerItem4 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_4.addItem(spacerItem4)
         self.verticalLayout_3.addLayout(self.horizontalLayout_4)
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_2.setSpacing(10)
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
-        spacerItem5 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_2.addItem(spacerItem5)
+        spacerItem3 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_2.addItem(spacerItem3)
         self.cancel_button = QtWidgets.QPushButton(self.dialog_frame)
         self.cancel_button.setMinimumSize(QtCore.QSize(100, 30))
         self.cancel_button.setFlat(False)

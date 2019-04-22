@@ -620,19 +620,21 @@ class CommodityItem(QGraphicsItem):
         self._x = x_position
         self._top = rect.top()
         self._height = rect.height()
+        self.setPos(self._x, self._top)
 
     def boundingRect(self):
-        return QRectF(-COMMODITY_LINE_WIDTH/2, self._top, COMMODITY_LINE_WIDTH, self._height)
+        return QRectF(-COMMODITY_LINE_WIDTH/2, 0, COMMODITY_LINE_WIDTH, self._height)
 
     def paint(self, painter, option, widget=None):
         painter.setPen(QPen(Qt.black, 2))
-        painter.drawLine(0, self._top, 0, self._top + self._height)
+        painter.drawLine(0, 0, 0, self._height)
 
     def update_line(self, top, height):
         old_bounding_rect = self.boundingRect()
         self._top = top
         self._height = height
         self.update(old_bounding_rect)
+        self.setPos(self._x, self._top)
 
     def hoverEnterEvent(self, event):
         event.widget().setCursor(Qt.PointingHandCursor)

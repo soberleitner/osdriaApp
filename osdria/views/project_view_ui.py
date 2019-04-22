@@ -3,8 +3,8 @@
 # Form implementation generated from reading ui file 'project_view.ui',
 # licensing of 'project_view.ui' applies.
 #
-# Created: Thu Apr 18 09:31:53 2019
-#      by: pyside2-uic  running on PySide2 5.12.1
+# Created: Thu Apr 18 11:19:59 2019
+#      by: pyside2-uic  running on PySide2 5.12.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -559,7 +559,7 @@ class Ui_MainWindow(object):
         self.main_graph = QtWidgets.QVBoxLayout()
         self.main_graph.setSpacing(0)
         self.main_graph.setObjectName("main_graph")
-        self.commodity_flow_view = CommodityFlowGraph(self.graph)
+        self.commodity_flow_view = FlowGraph(self.graph)
         self.commodity_flow_view.setObjectName("commodity_flow_view")
         self.main_graph.addWidget(self.commodity_flow_view)
         self.commodity_storage_view = QtWidgets.QGraphicsView(self.graph)
@@ -611,7 +611,7 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menu_run.menuAction())
 
         self.retranslateUi(MainWindow)
-        self.stacked_pages.setCurrentIndex(1)
+        self.stacked_pages.setCurrentIndex(3)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -654,11 +654,11 @@ class Ui_MainWindow(object):
         self.action_timeseries.setText(QtWidgets.QApplication.translate("MainWindow", "Timeseries", None, -1))
         self.action_timeseries.setShortcut(QtWidgets.QApplication.translate("MainWindow", "Ctrl+Shift+T", None, -1))
 
+from views.components.sidebar import Sidebar
 from views.components.property_edit import PropertyEdit
 from views.components.tool_button import ToolButton
-from views.components.section_selector import SectionSelector
+from views.components.flow_graph import FlowGraph
 from views.components.scene_view import SceneView
-from views.components.sidebar import Sidebar
-from views.components.commodity_flow_graph import CommodityFlowGraph
+from views.components.section_selector import SectionSelector
 import osdria_app_rc
 import osdria_app_rc
