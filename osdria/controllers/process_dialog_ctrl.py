@@ -5,7 +5,7 @@ from controllers.property_popup_ctrl import PropertyPopupCtrl
 from controllers.property_dialog_ctrl import PropertyDialogCtrl
 from views.property_popup_view import PropertyPopupView
 from views.property_dialog_view import PropertyDialogView
-from models.constants import ProcessCategory, OverviewSelection, DatasetResolution, PyomoVarType
+from models.constants import ProcessCategory, OverviewSelection, DatasetResolution, PyomoVarType, DisplayType
 from models.data_structure import List
 from models.property import *
 from models.element import ProcessCore, Commodity
@@ -24,15 +24,19 @@ class ProcessDialogCtrl(QObject):
             # create model for dialog
             dialog_model = PropertyDialog("Add Variable", [PropertyLineEdit("Name"),
                                                            PropertyLineEdit("Unit"),
-                                                           PropertyPopupMenu("Resolution", List(list(DatasetResolution))),
-                                                           PropertyPopupMenu("Pyomo Type", List(list(PyomoVarType)))])
+                                                           PropertyPopupMenu("Resolution",
+                                                                             List(list(DatasetResolution))),
+                                                           PropertyPopupMenu("Pyomo Type", List(list(PyomoVarType))),
+                                                           PropertyPopupMenu("Display Result",
+                                                                             List(list(DisplayType)))])
             if self.show_dialog(dialog_model):
                 # retrieve data from dialog model
                 name = dialog_model.values[0].value
                 unit = dialog_model.values[1].value
                 resolution = dialog_model.values[2].value
                 pyomo_type = dialog_model.values[3].value
-                item = PropertyVariable(name, resolution, pyomo_type, unit)
+                display_result = dialog_model.values[4].value
+                item = PropertyVariable(name, resolution, pyomo_type, unit, display_result)
                 # set list view data
                 self.add_item(model, item)
 
@@ -40,17 +44,21 @@ class ProcessDialogCtrl(QObject):
             # create model for dialog
             item = model.retrieve_data()[index]
             dialog_model = PropertyDialog("Edit Variable", [PropertyLineEdit("Unit", item.unit),
-                                                           PropertyPopupMenu("Resolution",
-                                                                             List(list(DatasetResolution)),
-                                                                             item.resolution),
-                                                           PropertyPopupMenu("Pyomo Type",
-                                                                             List(list(PyomoVarType)),
-                                                                             item.pyomo_type)])
+                                                            PropertyPopupMenu("Resolution",
+                                                                              List(list(DatasetResolution)),
+                                                                              item.resolution),
+                                                            PropertyPopupMenu("Pyomo Type",
+                                                                              List(list(PyomoVarType)),
+                                                                              item.type),
+                                                            PropertyPopupMenu("Display Result",
+                                                                              List(list(DisplayType)),
+                                                                              item.display)])
             if self.show_dialog(dialog_model):
                 # retrieve data from dialog model
                 item.unit = dialog_model.values[0].value
                 item.resolution = dialog_model.values[1].value
-                item.pyomo_type = dialog_model.values[2].value
+                item.type = dialog_model.values[2].value
+                item.display = dialog_model.values[3].value
 
     def change_data(self, command, index, model):
         if command == "Add":

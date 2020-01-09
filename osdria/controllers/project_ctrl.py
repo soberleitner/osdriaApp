@@ -43,8 +43,9 @@ class ProjectCtrl(QObject):
             for prop in process_core.properties:
                 if prop.type == PropType.POPUP_MENU:
                     prop.choices = model.time_series
-                    prop.value = list(filter(
-                        lambda time_serie: str(time_serie) == str(prop.value), model.time_series))[0]
+                    if model.time_series:
+                        prop.value = list(filter(
+                            lambda time_serie: str(time_serie) == str(prop.value), model.time_series))[0]
 
         # connect commodity type in Commodity instance with CommodityType in commodities
         for commodity in model.project_elements.commodity_list:
@@ -66,16 +67,21 @@ class ProjectCtrl(QObject):
 
             # output commodities
             for index, output in enumerate(process.outputs):
-                process.outputs[index] = list(filter(lambda commodity:
+                liste1 = list(filter(lambda commodity:
                                                      str(commodity) == str(output),
-                                                     model.project_elements.commodity_list))[0]
+                                                     model.project_elements.commodity_list))
+                if liste1:
+                    process.outputs[index] = liste1[0]
+                if not liste1:
+                    pass
 
             # link popup list of properties to project time series
             for prop in process.properties:
                 if prop.type == PropType.POPUP_MENU:
                     prop.choices = model.time_series
-                    prop.value = list(filter(
-                        lambda time_series: str(time_series) == str(prop.value), model.time_series))[0]
+                    if model.time_series:
+                        prop.value = list(filter(
+                            lambda time_series: str(time_series) == str(prop.value), model.time_series))[0]
 
         # todo add necessary model connectors
 
@@ -104,7 +110,7 @@ class ProjectCtrl(QObject):
 
     def run_optimization(self):
         dialog_model = OptimizationModel(self._model.project_elements)
-        optimization_ctrl = OptimizationDialogCtrl(dialog_model)
+        optimization_ctrl = OptimizationDialogCtrl(dialog_model, self._model.project_file)
         optimization_view = OptimizationDialogView(dialog_model, optimization_ctrl)
         optimization_view.show()
 

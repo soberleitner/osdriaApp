@@ -172,7 +172,10 @@ class Dict(QObject):
                 element = input_.readFloat()
             else:
                 element = element_class()
-                element.read(input_)
+                reading = True
+                if reading:
+                    element.read(input_)
+                reading = True
 
             # append element to list
             self._dict[name] = element

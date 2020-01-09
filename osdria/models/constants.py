@@ -110,13 +110,14 @@ class PyomoVarType(Enum):
     POSITIVE_INTEGERS
     NON_NEGATIVE_INTEGERS
     BOOLEAN"""
-    REALS = "Reals"
-    POSITIVE_REALS = "PositiveReals"
     NON_NEGATIVE_REALS = "NonNegativeReals"
-    INTEGERS = "Integers"
-    POSITIVE_INTEGERS = "PositiveIntegers"
     NON_NEGATIVE_INTEGERS = "NonNegativeIntegers"
     BOOLEAN = "Boolean"
+    NON_PYOMO = "NonPyomo"
+    REALS = "Reals"
+    POSITIVE_REALS = "PositiveReals"
+    INTEGERS = "Integers"
+    POSITIVE_INTEGERS = "PositiveIntegers"
     HOURLY = "Index Hourly"
     DAILY = "Index Daily"
     WEEKLY = "Index Weekly"
@@ -124,3 +125,13 @@ class PyomoVarType(Enum):
 
     def __str__(self):
         return self.value
+
+
+class DisplayType(Enum):
+    """define displaying of output"""
+    YES = 0
+    NO = 1
+
+    def __str__(self):
+        """return name as lowercase with first letter uppercase"""
+        return self.name.title()

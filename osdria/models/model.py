@@ -57,7 +57,7 @@ class Model(QObject):
         self.scenarios = ModelTemplate.scenarios()
         self.commodities = ModelTemplate.commodities()
         self.time_series = ModelTemplate.time_series()
-        self.process_cores = ModelTemplate.process_cores()
+        self.process_cores = ModelTemplate.process_cores(self.commodities, self.time_series)
         self.project_elements = ModelTemplate.project_elements()
         self._overview_sidebar_out = True
         self._sections_sidebar_out = True
@@ -111,6 +111,10 @@ class Model(QObject):
         self.process_cores.read(data_input)
         self.project_elements.read(data_input)
         self._project_file.close()
+
+    @property
+    def project_file(self):
+        return self._project_file
 
     @property
     def current_page(self):

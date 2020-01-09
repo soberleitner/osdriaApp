@@ -1,8 +1,8 @@
-from PySide2.QtCore import QSize, QPoint, QPointF, QLineF, QRect, QRectF, Qt, QMargins, QByteArray
+from PySide2.QtCore import QSize, QPoint, QPointF, QLineF, QRect, QRectF, Qt, QMargins
 from PySide2.QtGui import QPen, QBrush, QColor, QTransform, QCursor
-from PySide2.QtWidgets import QGraphicsScene, QGraphicsItemGroup, QGraphicsItem, QMenu, QAction, QMessageBox, QGraphicsLineItem
+from PySide2.QtWidgets import QGraphicsScene, QGraphicsItemGroup, QGraphicsItem, QMenu, QAction, QMessageBox
 
-from models.constants import MimeType, SelectConnect, OverviewSelection
+from models.constants import MimeType, SelectConnect, OverviewSelection, ProcessCategory
 from models.element import Process
 from models.data_structure import List
 
@@ -96,10 +96,14 @@ class SectionScene(QGraphicsScene):
 
         commodity_difference = PROCESS_SIZE / (len(commodity_types) + 1)
         for commodity_type in commodity_types:
-            item_position = process.coordinate.x() + PROCESS_SIZE / 2
             commodity_position = commodity_type.locations[self._section]
+            item_position = process.coordinate.x() + PROCESS_SIZE / 2
+            # set item_position to left/right border of process depending on commodity_position
+            if commodity_position < item_position:
+                item_position -= PROCESS_SIZE
+
             start_position = commodity_position if input_com else item_position
-            end_position = item_position - PROCESS_SIZE if input_com else commodity_position
+            end_position = item_position if input_com else commodity_position
 
             commodity_item = [item for item in self._commodity_items if item.data(0) is commodity_type]
             connection_item = [connection for connection in connections if connection.data(1) is commodity_item]
@@ -114,8 +118,13 @@ class SectionScene(QGraphicsScene):
             if connection_item:
                 connection_item = connection_item[0]
             else:
+                # ignore second double arrow for storage processes if start_position is left of end_position
+                if (process.core.category is ProcessCategory.STORAGE) & (end_position - start_position < 0):
+                    return
+
                 # create new connection item
-                connection_item = ConnectionItem(end_position - start_position)
+                connection_item = ConnectionItem(end_position - start_position,
+                                                 process.core.category is ProcessCategory.STORAGE)
                 commodity_item.setData(1, commodity_item.data(1) + 1)
                 connection_item.setData(1, commodity_item)
                 connection_list = process_item.data(1)
@@ -321,6 +330,10 @@ class SectionScene(QGraphicsScene):
 
         commodity_list = process.outputs if output else process.inputs
         commodity_list.add(commodity)
+        # add commodity in input and output list
+        if process.core.category is ProcessCategory.STORAGE:
+            commodity_list = process.outputs if not output else process.inputs
+            commodity_list.add(commodity)
 
         self.set_commodity_position(commodity.commodity_type, process, output)
 
@@ -647,9 +660,29 @@ class CommodityItem(QGraphicsItem):
 class ConnectionItem(QGraphicsItem):
     """create horizontal connection arrows"""
 
-    def __init__(self, length):
+    def __init__(self, length, double_arrow=False):
         super().__init__()
-        self._length = length
+        self._length = abs(length)
+
+        if length < 0:
+            self.setRotation(180)
+
+        right_arrow = [QPointF(self._length - ARROW_SIZE, 0),
+                       QPointF(self._length - ARROW_SIZE, -ARROW_SIZE / 2),
+                       QPointF(self._length, 0),
+                       QPointF(self._length - ARROW_SIZE, ARROW_SIZE / 2),
+                       QPointF(self._length - ARROW_SIZE, 0)]
+
+        left_arrow = [QPointF(ARROW_SIZE, 0),
+                      QPointF(ARROW_SIZE, -ARROW_SIZE / 2),
+                      QPointF(0, 0),
+                      QPointF(ARROW_SIZE, ARROW_SIZE / 2),
+                      QPointF(ARROW_SIZE, 0)]
+
+        if double_arrow:
+            self._points = left_arrow + right_arrow
+        else:
+            self._points = [QPointF(0, 0)] + right_arrow
 
     def boundingRect(self):
         return QRect(0, -ARROW_SIZE/2, self._length, ARROW_SIZE/2)
@@ -657,10 +690,4 @@ class ConnectionItem(QGraphicsItem):
     def paint(self, painter, option, widget=None):
         painter.setPen(QPen(Qt.black, 2))
         painter.setBrush(QBrush(Qt.black))
-        points = [QPointF(0, 0),
-                  QPointF(self._length - ARROW_SIZE, 0),
-                  QPointF(self._length - ARROW_SIZE, -ARROW_SIZE/2),
-                  QPointF(self._length, 0),
-                  QPointF(self._length - ARROW_SIZE, ARROW_SIZE/2),
-                  QPointF(self._length - ARROW_SIZE, 0)]
-        painter.drawPolygon(points)
+        painter.drawPolygon(self._points)

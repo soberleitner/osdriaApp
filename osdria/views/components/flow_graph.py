@@ -48,7 +48,9 @@ class FlowGraph(QWidget):
             if direction == "input_processes":
                 multiplier = -1
             for process, commodity_flow in processes.items():
-                process_lines.append(multiplier * np.array(commodity_flow))
+                repetition_array = np.repeat(int(8760/len(commodity_flow)), len(commodity_flow)-1)
+                process_lines.append(multiplier * np.repeat(np.array(commodity_flow),
+                                                            np.hstack([repetition_array, 8760-sum(repetition_array)])))
                 process_labels.append(process)
 
             x_values = range(len(process_lines[0]))

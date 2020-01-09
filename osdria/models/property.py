@@ -1,7 +1,7 @@
 from PySide2.QtCore import *
 
 from models.data_structure import List
-from models.constants import PropType, PyomoVarType, DatasetResolution
+from models.constants import PropType, PyomoVarType, DatasetResolution, DisplayType
 
 
 class PropertyValue(QObject):
@@ -76,12 +76,14 @@ class PropertyVariable(QObject):
         @param: pyomo_type(PyomoVarType)
         @param: unit(str)"""
 
-    def __init__(self, name="", resolution=DatasetResolution.YEARLY, pyomo_type=PyomoVarType.REALS, unit=""):
+    def __init__(self, name="", resolution=DatasetResolution.YEARLY, pyomo_type=PyomoVarType.REALS,
+                 unit="", display=DisplayType.NO):
         super().__init__()
         self._name = name
-        self._resolution = resolution
-        self._type = pyomo_type
-        self._unit = unit
+        self.resolution = resolution
+        self.type = pyomo_type
+        self.unit = unit
+        self.display = display
 
     def __str__(self):
         return self._name
@@ -89,32 +91,23 @@ class PropertyVariable(QObject):
     def write(self, output):
         """write data to output stream"""
         output.writeString(self._name)
-        output.writeUInt32(self._resolution.value)
-        output.writeString(self._type.value)
-        output.writeString(self._unit)
+        output.writeUInt32(self.resolution.value)
+        output.writeString(self.type.value)
+        output.writeString(self.unit)
+        output.writeUInt32(self.display.value)
 
     def read(self, input_):
         """read data from input stream"""
         self._name = input_.readString()
-        self._resolution = DatasetResolution(input_.readUInt32())
-        self._type = PyomoVarType(input_.readString())
-        self._unit = input_.readString()
+        self.resolution = DatasetResolution(input_.readUInt32())
+        self.type = PyomoVarType(input_.readString())
+        self.unit = input_.readString()
+        self.display = DisplayType(input_.readUInt32())
 
     @property
     def name(self):
         return self._name
 
-    @property
-    def resolution(self):
-        return self._resolution
-
-    @property
-    def pyomo_type(self):
-        return self._type
-
-    @property
-    def unit(self):
-        return self._unit
 
 class PropertyValueTimeSeries(PropertyValue):
     """data stored for property value representing a times series
@@ -250,7 +243,11 @@ class PropertyPopupMenu(PropertyValue):
         self._choices.read(input_)
         # get object from choices list based on saved name in value
         if self._choices:
-            value = list(filter(lambda x: str(x) == super(PropertyPopupMenu, self).value, self._choices))[0]
+            value_list = list(filter(lambda x: str(x) == super(PropertyPopupMenu, self).value, self._choices))
+            if value_list:
+                value = value_list[0]
+            else:
+                value = self._choices[0]
         else:
             value = ""
         PropertyValue.value.fset(self, value)

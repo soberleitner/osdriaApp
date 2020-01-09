@@ -56,5 +56,23 @@
         <file>img/logo_light@2x.png</file>
         <file>img/logo@2x.png</file>
         <file>img/process_icon@2x.png</file>
+        <file>img/battery@2x.png</file>
+        <file>img/bio_waste@2x.png</file>
+        <file>img/biogas_generator@2x.png</file>
+        <file>img/biogas_plant@2x.png</file>
+        <file>img/biogas_tank@2x.png</file>
+        <file>img/demand@2x.png</file>
+        <file>img/diesel_generator@2x.png</file>
+        <file>img/fuel_market@2x.png</file>
+        <file>img/photovoltaics@2x.png</file>
+        <file>img/aquifer@2x.png</file>
+        <file>img/fallow_land@2x.png</file>
+        <file>img/food_market@2x.png</file>
+        <file>img/forest_land@2x.png</file>
+        <file>img/land_size@2x.png</file>
+        <file>img/maize_field@2x.png</file>
+        <file>img/water_tank@2x.png</file>
+        <file>img/maize_straw_silo@2x.png</file>
+        <file>img/water_pump@2x.png</file>
     </qresource>
 </RCC>

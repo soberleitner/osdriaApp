@@ -3,7 +3,7 @@ from PySide2.QtWidgets import *
 from views.components.section_scene import SectionScene
 from views.project_view_ui import Ui_MainWindow
 
-from models.constants import OverviewSelection, PageType, SelectConnect, ZoomType, ProcessCategory, DatasetResolution
+from models.constants import *
 from models.property import PropertyPopupMenu, PropertyLineEdit
 from models.data_structure import List
 
@@ -191,6 +191,7 @@ class ProjectView(QMainWindow):
         self._project_ctrl.change_page(PageType.DRAFT)
 
     def on_commodity_change(self, commodity_type):
+        """commodity line in scene selected"""
         if commodity_type is not None:
             self._ui.title_graph.setText(str(commodity_type))
             commodities = list(filter(lambda commodity: commodity.commodity_type is commodity_type,
@@ -203,6 +204,7 @@ class ProjectView(QMainWindow):
             self._project_ctrl.change_page(PageType.GRAPH)
 
     def on_commodity_choose(self, commodity):
+        """commodity in dropdown menu of commodity page selected"""
         self._ui.commodity_flow_view.set_data(commodity.optimization_output)
 
     def show_section_sidebar(self, process):
@@ -213,7 +215,8 @@ class ProjectView(QMainWindow):
             properties.extend(process.properties.list)
             # extend shown property list with optimization variables that have single values
             if process.optimization_output:
-                single_variables = list(filter(lambda var: var.resolution is DatasetResolution.YEARLY,
+                single_variables = list(filter(lambda var: (var.resolution is DatasetResolution.YEARLY) &
+                                                           (var.display is DisplayType.YES),
                                                process.core.variables))
                 for variable in single_variables:
                     # display 3 significant figures

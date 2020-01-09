@@ -250,7 +250,7 @@ class Commodity(QObject):
         self._name = name
         self._type = commodity_type
         self._id = id(self)
-        self._resolution = resolution
+        self.resolution = resolution
         self.optimization_output = Dict({'input_processes': Dict({}), 'output_processes': Dict({})})
         self.connection_count = Dict({})
 
@@ -261,7 +261,7 @@ class Commodity(QObject):
         output.writeUInt64(self._id)
         self.optimization_output.write(output)
         self.connection_count.write(output)
-        output.writeUInt32(self._resolution.value)
+        output.writeUInt32(self.resolution.value)
 
     def read(self, input_):
         """read data from input stream"""
@@ -270,7 +270,7 @@ class Commodity(QObject):
         self._id = input_.readUInt64()
         self.optimization_output.read(input_)
         self.connection_count.read(input_)
-        self._resolution = DatasetResolution(input_.readUInt32())
+        self.resolution = DatasetResolution(input_.readUInt32())
 
     def __str__(self):
         return self._name
@@ -310,7 +310,3 @@ class Commodity(QObject):
     @property
     def unique_id(self):
         return self._id
-
-    @property
-    def resolution(self):
-        return self._resolution
